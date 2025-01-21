@@ -14,20 +14,19 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('phone', 15);
+            $table->string('phone', 20);
             $table->string('email')->nullable();
             $table->string('password')->nullable();
             $table->string('profile_image')->nullable();
-            $table->date('dob')->nullable();
-            $table->string('dob_hijri')->nullable();
-            $table->integer('age')->nullable()->comment('Month');
-            $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
-            $table->enum('gender', ['male', 'female', 'others'])->nullable();
-            $table->enum('user_type', ['student', 'teacher', 'staff'])->nullable(); 
-            $table->json('senior_user')->nullable(); 
-            $table->json('junior_user')->nullable();
+            $table->enum('user_type', ['customer', 'employee'])->nullable();  
 
-            $table->foreignId('role_id')->nullable()->constrained();  
+            $table->date('dob')->nullable();  
+            $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
+            $table->enum('gender', ['male', 'female', 'others'])->nullable(); 
+
+            $table->json('senior_user')->nullable();
+            $table->json('junior_user')->nullable(); 
+            
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();

@@ -15,11 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->string('employee_id')->uniqid();
-            $table->string('signature')->nullable(); 
+            $table->foreignId('designation_id')->nullable()->constrained();
+            $table->foreignId('referred_by')->nullable()->constrained('users');
+            $table->string('signature')->nullable();
+            $table->decimal('salary')->default(0);
 
-            $table->foreignId('ref_id')->nullable()->constrained('users');  
+            $table->tinyInteger('status')->default(1)->comment('1= Active, 0= Resigned');
+            $table->date('resigned_at')->nullable();
 
-            $table->tinyInteger('status')->default(1)->comment('1= Active, 0= Inactive'); 
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();

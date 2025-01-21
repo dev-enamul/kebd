@@ -1,8 +1,7 @@
 <?php
 
 use App\Helpers\ReportingService;
-use App\Http\Controllers\Admin\Admission\InterviewController;
-use App\Models\StudentRegister;
+use App\Http\Controllers\Admin\Admission\InterviewController; 
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +16,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {    
-    // return view('welcome');
-    dd(StudentRegister::nextKitabId());
-});
-
-Route::get("meetLink",[InterviewController::class,'sendWhatsAppMessage']);
+ 

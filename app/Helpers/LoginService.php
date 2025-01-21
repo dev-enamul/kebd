@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 class LoginService {
 
     public static function createResponse($user)
-    {  
+    {
         $token = $user->createToken('authToken')->plainTextToken;
  
         $permissions = $user->role->slug === 'admin'
@@ -24,8 +24,7 @@ class LoginService {
             'token' => $token,
             'user' => [
                 'name' => $user->name,
-                'email' => $user->email,
-                'user_type' => $user->user_type,
+                'email' => $user->email, 
                 'role' => $user->role->slug,
             ],
             'permissions' => $permissions,

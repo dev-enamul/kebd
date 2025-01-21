@@ -64,25 +64,8 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
-    public function studentRegister()
-    {
-        return $this->hasOne(StudentRegister::class, 'user_id');
-    }  
-
-    public function userFamily()
-    {
-        return $this->hasOne(UserFamily::class, 'user_id');
-    }
-
-    public function admissionProgress()
-    {
-        return $this->hasOne(AdmissionProgressStatus::class, 'user_id');
-    }
-
-    public function guardian()
-    {
-        return $this->hasOne(Guardian::class, 'user_id');
-    }
+   
+  
 
     public function address()
     {

@@ -14,13 +14,15 @@ return new class extends Migration
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id'); 
-            $table->enum('address_type', ['permanent', 'temporary']);
-            $table->string('house_or_state')->nullable();
-            $table->string('village_or_area')->nullable();
-            $table->string('post_office')->nullable();
-            $table->string('upazila_thana')->nullable();
+            $table->enum('address_type', ['permanent', 'present']); 
+            $table->string('country')->nullable();
+            $table->string('division')->nullable();
             $table->string('district')->nullable();
-            $table->string('division')->nullable();  
+            $table->string('upazila_or_thana')->nullable(); 
+            $table->string('zip_code')->nullable(); 
+            $table->text('address')->nullable(); 
+
+            $table->boolean('is_same_present_permanent')->default(1)->comment('0=Diff Address , 1  = Same Address');
             $table->timestamps();
         });
     }

@@ -1,74 +1,53 @@
 <?php
 
-namespace App\Http\Controllers\AdminEmployee;
+namespace App\Http\Controllers\Customer;
 
-use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\EmployeeStoreResource;
-use App\Models\DesignationLog;
-use App\Models\Employee;
-use App\Models\EmployeeDesignation;
+use App\Models\Customer;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserContact;
-use App\Models\UserReporting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class EmployeeController extends Controller
-{ 
+class CustomerController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        try {
-            $data = DB::table('users')
-                ->leftJoin('employees', 'users.id', '=', 'employees.user_id')  
-                ->leftJoin('employee_designations', function ($join) {
-                    $join->on('employees.id', '=', 'employee_designations.employee_id')
-                        ->whereNull('employee_designations.end_date');
-                })  
-                ->leftJoin('designations', 'employee_designations.designation_id', '=', 'designations.id')  
-                ->select( 
-                    'employees.id as id',
-                    'users.id as user_id', 
-                    'employees.employee_id', 
-                    'users.profile_image', 
-                    'users.name',  
-                    'users.phone', 
-                    'users.email', 
-                    'users.senior_user', 
-                    'users.junior_user',
-                    'designations.title as designation'
-                )
-                ->where('user_type','employee')
-                ->where('users.user_type', 'employee') // Filter only employee users
-                ->get();
-
-            return success_response($data);
-
-
-        } catch (\Exception $e) {   
-            return error_response($e->getMessage(), 500);
-        }
+        //
     }
- 
-    public function store(EmployeeStoreResource $request)
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
         DB::beginTransaction();
         try {
             $profilePicPath = null;
             if ($request->hasFile('profile_image')) {
                 $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
-            }
- 
-            $auth_user = User::find(auth()->id);
+            }  
+            
             $user = User::create([
                 'name'          => $request->name,
                 'email'         => $request->email,
                 'phone'         => $request->phone,
                 'password'      => Hash::make("12345678"),
-                'user_type'     => 'employee',  
-                'profile_image' => $profilePicPath,  
+                'user_type'     => 'customer',
+                'profile_image' => $profilePicPath,
                 'dob'           => $request->dob, 
                 'blood_group'   => $request->blood_group, 
                 'gender'        => $request->gender, 
@@ -77,7 +56,7 @@ class EmployeeController extends Controller
             UserContact::create([
                 'user_id'           => $user->id,
                 'name'              => $request->name,
-                'relationship_or_role' => "Employee",
+                'relationship_or_role' => "Customer",
                 'office_phone'      => $request->office_phone,
                 'personal_phone'    => $request->personal_phone,
                 'office_email'      => $request->office_email,
@@ -112,10 +91,12 @@ class EmployeeController extends Controller
                 ]);
             }
  
-            $employee = Employee::create([
+            $customer = Customer::create([
                 'user_id' => $user->id,
-                'employee_id' => Employee::generateNextEmployeeId(),
-                'designation_id'=> $request->designation_id, 
+                'customer_id' => Customer::generateNextCustomerId(),
+                'lead_source_id' => $request->lead_source_id,
+                'ref_id' => $request->ref_id,
+                'designation_id'=> $request->designation_id,
                 'status' => 1,
             ]); 
 
@@ -132,9 +113,7 @@ class EmployeeController extends Controller
                 'reporting_user_id' => $request->reporting_user_id,
                 'start_date' => now() 
             ]);
-
-            $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
-            $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
+ 
             $user->save();
             
             DB::commit();  
@@ -146,18 +125,33 @@ class EmployeeController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(string $id)
     {
         //
     }
 
-    
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(string $id)
     {
         //

@@ -15,6 +15,7 @@ class DesignationSeeder extends Seeder
     public function run(): void
     {
         $designations = [
+            ['title' => 'admin', 'department' => 'admin', 'level' => 'admin', 'salary_range_min' => 100000, 'salary_range_max' => 200000],
             ['title' => 'Chief Executive Officer', 'department' => 'Executive', 'level' => 'C-Level', 'salary_range_min' => 100000, 'salary_range_max' => 200000],
             ['title' => 'Chief Operating Officer', 'department' => 'Operations', 'level' => 'C-Level', 'salary_range_min' => 90000, 'salary_range_max' => 180000],
             ['title' => 'Chief Technology Officer', 'department' => 'Technology', 'level' => 'C-Level', 'salary_range_min' => 90000, 'salary_range_max' => 170000],
