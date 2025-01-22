@@ -10,15 +10,15 @@ class UserAddress extends Model
     use HasFactory; 
     protected $fillable = [
         'user_id',
-        'is_same_address',
         'address_type',
-        'house_or_state',
-        'village_or_area',
-        'post_office',
-        'upazila_thana',
-        'district',
+        'country',
         'division',
-    ];     
+        'district',
+        'upazila_or_thana',
+        'zip_code',
+        'address',
+        'is_same_present_permanent',
+    ];   
 
     public function user()
     {

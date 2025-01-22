@@ -20,8 +20,6 @@ class UserContact extends Model
         'imo',
         'facebook',
         'linkedin',
-        'emergency_contact_number',
-        'emergency_contact_person',
     ];
     
 }

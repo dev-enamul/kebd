@@ -16,22 +16,20 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     */
+     */ 
+
     protected $fillable = [
         'name',
         'phone',
         'email',
         'password',
         'profile_image',
+        'user_type',
         'dob',
-        'dob_hijri',
-        'age',
         'blood_group',
         'gender',
         'senior_user',
         'junior_user',
-        'user_type',
-        'role_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -58,18 +56,19 @@ class User extends Authenticatable
         'password' => 'hashed',
     ]; 
 
-    
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-   
+     public function employee(){
+        return $this->hasOne(Employee::class, 'user_id');
+     }
   
 
     public function address()
     {
         return $this->hasMany(UserAddress::class, 'user_id');
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(UserContact::class, 'user_id');
     }
 
     public function createdBy()

@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class FollowupCategory extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'slug',
+        'status',
+        'serial',
+    ];
 }

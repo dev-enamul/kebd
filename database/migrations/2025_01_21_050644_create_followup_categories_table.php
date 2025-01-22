@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title'); 
             $table->string('slug');
             $table->tinyInteger('status')->default(1)->comment("0=Inactive, 1 = Active");
+            $table->integer('serial');
             $table->timestamps();
         });
     }

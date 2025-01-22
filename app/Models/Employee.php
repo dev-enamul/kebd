@@ -12,9 +12,12 @@ class Employee extends Model
     protected $fillable = [
         'user_id',
         'employee_id',
+        'designation_id',
+        'referred_by',
         'signature',
-        'ref_id',
+        'salary',
         'status',
+        'resigned_at',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -36,10 +39,16 @@ class Employee extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
 
-    public function employeeDesignations()
+    public function designation()
     {
-        return $this->hasMany(EmployeeDesignation::class);
+        return $this->belongsTo(Designation::class);
+    }
+
+    public function designationLog()
+    {
+        return $this->hasMany(DesignationLog::class);
     }
     
 }

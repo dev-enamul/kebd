@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\Lead;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerStoreRequest;
@@ -11,32 +11,30 @@ use App\Models\SalesPipeline;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserContact;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class CustomerController extends Controller
+class LeadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    
+    public function index(Request $request)
     {
-        //
+        try {
+            $category = $request->category_id;  
+            $query = SalesPipeline::whereIn('status', ['Active', 'Waiting']);  
+            if ($category) {
+                $query->where('followup_categorie_id', $category);  
+            } 
+            $datas = $query->get(); 
+            return success_response($datas);
+        } catch (Exception $e) {
+            return error_response($e->getMessage(), $e->getCode());
+        }
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(CustomerStoreRequest $request)
     { 
         DB::beginTransaction();
@@ -66,7 +64,7 @@ class CustomerController extends Controller
                 'created_by' => Auth::user()->id,
             ]);
 
-            $followup_category = FollowupCategory::orderBy('serial', 'desc')->first(); 
+            $followup_category = FollowupCategory::orderBy('serial', 'asc')->first(); 
             $pipeline = SalesPipeline::create([
                 'user_id' =>  $user->id,
                 'customer_id' => $customer->id,
@@ -124,43 +122,11 @@ class CustomerController extends Controller
             } 
             
             DB::commit();  
-            return success_response(null,'Leads has been created');
+            return success_response(null,'Lead has been created');
 
         } catch (\Exception $e) { 
             DB::rollBack();  
             return error_response($e->getMessage(), 500);
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

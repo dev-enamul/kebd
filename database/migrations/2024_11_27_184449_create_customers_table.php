@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('lead_source_id')->constrained();
+            $table->foreignId('lead_source_id')->nullable()->constrained();
             $table->string('customer_id')->nullable()->comment("CUS-001");    
             $table->foreignId('referred_by')->nullable()->constrained('users');
             $table->integer('total_sales')->default(0)->nullable()->comment("Total Products Sales");
             $table->integer('total_sales_amount')->default(0)->nullable()->comment("Total Amount of  Sales"); 
-            $table->boolean('newsletter_subscribed')->default(true);  
+            $table->boolean('newsletter_subscribed')->default(true);
 
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');

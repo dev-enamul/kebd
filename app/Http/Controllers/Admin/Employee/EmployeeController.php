@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\AdminEmployee;
+namespace App\Http\Controllers\Admin\Employee;
 
 use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
@@ -12,41 +12,24 @@ use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserContact;
 use App\Models\UserReporting;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 { 
     public function index()
     {
         try {
-            $data = DB::table('users')
-                ->leftJoin('employees', 'users.id', '=', 'employees.user_id')  
-                ->leftJoin('employee_designations', function ($join) {
-                    $join->on('employees.id', '=', 'employee_designations.employee_id')
-                        ->whereNull('employee_designations.end_date');
-                })  
-                ->leftJoin('designations', 'employee_designations.designation_id', '=', 'designations.id')  
-                ->select( 
-                    'employees.id as id',
-                    'users.id as user_id', 
-                    'employees.employee_id', 
-                    'users.profile_image', 
-                    'users.name',  
-                    'users.phone', 
-                    'users.email', 
-                    'users.senior_user', 
-                    'users.junior_user',
-                    'designations.title as designation'
-                )
-                ->where('user_type','employee')
-                ->where('users.user_type', 'employee') // Filter only employee users
-                ->get();
-
-            return success_response($data);
-
-
+            $data = User::where('user_type', 'employee')
+                ->join('employees', 'users.id', '=', 'employees.user_id')
+                ->join('designations', 'employees.designation_id', '=', 'designations.id')
+                ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
+                ->get(); 
+            return success_response($data); 
         } catch (\Exception $e) {   
             return error_response($e->getMessage(), 500);
         }
@@ -60,8 +43,7 @@ class EmployeeController extends Controller
             if ($request->hasFile('profile_image')) {
                 $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
             }
- 
-            $auth_user = User::find(auth()->id);
+  
             $user = User::create([
                 'name'          => $request->name,
                 'email'         => $request->email,
@@ -72,6 +54,7 @@ class EmployeeController extends Controller
                 'dob'           => $request->dob, 
                 'blood_group'   => $request->blood_group, 
                 'gender'        => $request->gender, 
+                'created_by'    => Auth::user()->id,
             ]); 
  
             UserContact::create([
@@ -95,9 +78,10 @@ class EmployeeController extends Controller
                 'division'          => $request->permanent_division,
                 'district'          => $request->permanent_district,
                 'upazila_or_thana'  => $request->permanent_upazila_or_thana,
-                'address'           => $request->permanent_address,
+                "zip_code"          => $request->permanent_zip_code,
+                'address'           => $request->permanent_address, 
                 "is_same_present_permanent" => $request->is_same_present_permanent
-            ]);   
+            ]);
 
             if(!$request->is_same_present_permanent){
                 UserAddress::create([
@@ -107,7 +91,8 @@ class EmployeeController extends Controller
                     'division'          => $request->present_division,
                     'district'          => $request->present_district,
                     'upazila_or_thana'  => $request->present_upazila_or_thana,
-                    'address'           => $request->present_address,
+                    "zip_code"          => $request->present_zip_code,
+                    'address'           => $request->present_address, 
                     "is_same_present_permanent" => $request->is_same_present_permanent
                 ]);
             }
@@ -117,6 +102,8 @@ class EmployeeController extends Controller
                 'employee_id' => Employee::generateNextEmployeeId(),
                 'designation_id'=> $request->designation_id, 
                 'status' => 1,
+                'created_by'    => Auth::user()->id
+                
             ]); 
 
             // Create Employee Designation
@@ -148,14 +135,116 @@ class EmployeeController extends Controller
 
     public function show(string $id)
     {
-        //
+        try{
+            $data = User::with(['employee', 'address', 'contact'])->find($id);
+            return success_response($data);
+        }catch(Exception $e){
+            return error_response($e->getMessage(), $e->getCode());
+        }
+        
+
     }
 
     
-    public function update(Request $request, string $id)
+    public function update(EmployeeStoreResource $request, string $id)
     {
-        //
+        DB::beginTransaction();
+        try { 
+            $user = User::findOrFail($id); 
+            $profilePicPath = $user->profile_image; 
+            if ($request->hasFile('profile_image')) { 
+                if ($profilePicPath) {
+                    Storage::disk('public')->delete($profilePicPath);
+                } 
+                $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
+            }
+     
+            $user->update([
+                'name'          => $request->name,
+                'email'         => $request->email,
+                'phone'         => $request->phone,
+                'profile_image' => $profilePicPath,
+                'dob'           => $request->dob,
+                'blood_group'   => $request->blood_group,
+                'gender'        => $request->gender,
+                'updated_by'    => auth()->id(),
+            ]);
+     
+            $user->contact()->updateOrCreate(
+                ['user_id' => $user->id],  
+                [
+                    'name'              => $request->name,
+                    'relationship_or_role' => "Employee",
+                    'office_phone'      => $request->office_phone,
+                    'personal_phone'    => $request->personal_phone,
+                    'office_email'      => $request->office_email,
+                    'personal_email'    => $request->personal_email,
+                    'whatsapp'          => $request->whatsapp,
+                    'imo'               => $request->imo,
+                    'facebook'          => $request->facebook,
+                    'linkedin'          => $request->linkedin,
+                ]
+            );
+     
+            $user->address()->updateOrCreate(
+                ['user_id' => $user->id, 'address_type' => 'permanent'],  
+                [
+                    'country'           => $request->permanent_country,
+                    'division'          => $request->permanent_division,
+                    'district'          => $request->permanent_district,
+                    'upazila_or_thana'  => $request->permanent_upazila_or_thana,
+                    "zip_code"          => $request->permanent_zip_code,
+                    'address'           => $request->permanent_address,
+                    "is_same_present_permanent" => $request->is_same_present_permanent,
+                ]
+            );
+     
+            if (!$request->is_same_present_permanent) {
+                $user->address()->updateOrCreate(
+                    ['user_id' => $user->id, 'address_type' => 'present'],
+                    [
+                        'country'           => $request->present_country,
+                        'division'          => $request->present_division,
+                        'district'          => $request->present_district,
+                        'upazila_or_thana'  => $request->present_upazila_or_thana,
+                        "zip_code"          => $request->present_zip_code,
+                        'address'           => $request->present_address,
+                        "is_same_present_permanent" => $request->is_same_present_permanent,
+                    ]
+                );
+            }
+     
+            $user->employee()->update([
+                'designation_id' => $request->designation_id,
+                'updated_by'     => auth()->id(),
+            ]);
+     
+            // $user->employee->designationLog()->updateOrCreate( 
+            //     ['employee_id' => $user->employee->id,  'designation_id' => $request->designation_id],
+            //     ['start_date' => now()]
+            // );
+     
+            $user->reporting()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'reporting_user_id' => $request->reporting_user_id,
+                    'start_date'        => now(),
+                ]
+            );
+     
+            $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
+            $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
+            $user->save();
+    
+            DB::commit();
+            return success_response(null, 'Employee details have been updated successfully.');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return error_response($e->getMessage(), 500);
+        }
     }
+    
 
     
     public function destroy(string $id)

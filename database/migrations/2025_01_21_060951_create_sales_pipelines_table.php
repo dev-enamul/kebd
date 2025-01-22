@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_pipeline', function (Blueprint $table) {
+        Schema::create('sales_pipelines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->json('service_ids')->nullable();
-            $table->foreignId('followup_categorie_id')->constrained('followup_categories')->onDelete('set null');
+            $table->foreignId('followup_categorie_id')->constrained('followup_categories');
         
             $table->integer('purchase_probability')->nullable()->default(null)->comment("0-100%");
             $table->decimal('price')->nullable()->default(null);
             $table->date('next_followup_date')->nullable();
             $table->timestamp('last_contacted_at')->nullable();
             
-            $table->foreignId('assigned_to')->nullable()->constrained()->onDelete('set null');  
+            $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); 
             $table->enum('status', ['Active', 'Rejected', 'Salsed', 'Waiting'])->default('Active');
             $table->timestamps(); 
         });

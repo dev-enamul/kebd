@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Employee\DesignationController;
-use App\Http\Controllers\AdminEmployee\EmployeeController;
+use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Auth\AuthController; 
 use App\Http\Controllers\Common\CountryApiController; 
 use App\Http\Controllers\Common\DistrictApiController;
@@ -9,9 +9,11 @@ use App\Http\Controllers\Common\DivisionApiController;
 use App\Http\Controllers\Common\RoleApiController;
 use App\Http\Controllers\Common\UnionApiController;
 use App\Http\Controllers\Common\UpazilaApiController;
-use App\Http\Controllers\Customer\CustomerController;
-use App\Http\Controllers\Followup\FollowupCategoryController;
+use App\Http\Controllers\Followup\FollowupController;
+use App\Http\Controllers\Lead\LeadController;
 use App\Http\Controllers\Service\ServiceController;
+use App\Http\Controllers\Setting\FollowupCategoryController;
+use App\Models\FollowupCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,14 +35,18 @@ Route::get('countries',CountryApiController::class);
 Route::get('divisions',DivisionApiController::class);
 Route::get('districts',DistrictApiController::class);
 Route::get('upazilas',UpazilaApiController::class);
-Route::get('unions',UnionApiController::class);  
+Route::get('unions',UnionApiController::class);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
-    Route::resource('followup-category', FollowupCategoryController::class);
+    Route::resource('service', ServiceController::class); 
     Route::resource('employee', EmployeeController::class);
-    Route::resource('service', ServiceController::class);
-    Route::resource('customer', CustomerController::class);
+    Route::resource('lead', LeadController::class);
+    Route::resource('followup', FollowupController::class);
+
+
+    // Setting 
+    Route::resource('followup-category', FollowupCategoryController::class);
 });
 
 

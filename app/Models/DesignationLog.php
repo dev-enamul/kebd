@@ -15,4 +15,9 @@ class DesignationLog extends Model
         'start_date',
         'end_date',
     ];
+
+
+    public function permissions(){
+        return $this->hasMany(DesignationPermission::class, 'designation_id');
+    }
 }

@@ -16,16 +16,16 @@ class LoginService {
     {
         $token = $user->createToken('authToken')->plainTextToken;
  
-        $permissions = $user->role->slug === 'admin'
+        $permissions = $user->employee->designation->slug == 'admin'
             ? Permission::pluck('slug')  
-            : $user->role->permissions->pluck('slug'); 
+            : $user->employee->designation->permission->pluck('slug'); 
      
         $data = [
             'token' => $token,
             'user' => [
                 'name' => $user->name,
                 'email' => $user->email, 
-                'role' => $user->role->slug,
+                'designation' => $user->employee->designation,
             ],
             'permissions' => $permissions,
         ];   

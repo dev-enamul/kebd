@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Designation extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'slug',
+        'status',
+    ];
+
+    public function permission(){
+        return $this->hasMany(Permission::class);
+    }
 }
