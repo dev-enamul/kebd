@@ -24,7 +24,6 @@ class LeadController extends Controller
     public function index(Request $request)
     { 
         try {
-            
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             
@@ -40,28 +39,23 @@ class LeadController extends Controller
             if ($category) {
                 $query->where('sales_pipelines.followup_categorie_id', $category);
             }  
-
+        
             $user = User::find(Auth::user()->id);
             $designation = @$user->employee->designation->slug;
-            if($designation!="admin"){
+            if($designation != "admin"){
                 $query->where('sales_pipelines.assigned_to', $user->id);
             }
-
         
-            $datas = $query->get();
-        
-            // Grouping the data by `lead_id` to ensure only one row per SalesPipeline
+            $datas = $query->get(); 
             $datas = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
-                $salesPipeline = $salesPipelines->first();  // Get the first row (as all rows have the same lead_id)
-                
-                // Group the services related to the salesPipeline
+                $salesPipeline = $salesPipelines->first();   
                 $services = $salesPipelines->map(function ($pipeline) {
                     return [
                         'id' => $pipeline->service_id,
                         'name' => $pipeline->service_name,
                     ];
                 });
-        
+            
                 return [
                     'id' => $salesPipeline->lead_id,
                     'name' => $salesPipeline->user_name,
@@ -71,12 +65,13 @@ class LeadController extends Controller
                     'last_contacted_at' => $salesPipeline->last_contacted_at,
                     'services' => $services,
                 ];
-            });
-        
+            })->values()->all(); // Convert to array
+            
             return success_response($datas);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
         }
+        
         
         
         
