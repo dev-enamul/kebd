@@ -11,8 +11,7 @@ class SalesPipeline extends Model
 
     protected $fillable = [
         'user_id',
-        'customer_id',
-        'service_ids',
+        'customer_id', 
         'followup_categorie_id',
         'purchase_probability',
         'price',
@@ -21,5 +20,19 @@ class SalesPipeline extends Model
         'assigned_to',
         'status',
     ];
-    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+ 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'sales_pipeline_services', 'sales_pipeline_id', 'service_id');
+    }
+ 
+    public function followupCategory()
+    {
+        return $this->belongsTo(FollowupCategory::class, 'followup_categorie_id');
+    }
 }

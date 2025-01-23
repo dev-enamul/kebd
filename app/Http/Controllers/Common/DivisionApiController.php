@@ -20,8 +20,7 @@ class DivisionApiController extends Controller
                 })
                 ->where(function ($query) use ($keyword) {  
                     $query->where('name', 'LIKE', '%' . $keyword . '%');
-                })
-                ->take(10)
+                }) 
                 ->get();  
  
             if ($data->isEmpty()) {

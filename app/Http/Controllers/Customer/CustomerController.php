@@ -78,7 +78,7 @@ class CustomerController extends Controller
             FollowupLog::create([
                 'user_id' => $user->id,
                 'customer_id' => $customer->id,
-                'pipeline_id' => $pipeline->id,
+                'ad' => $pipeline->id,
                 'followup_category_id' => $followup_category->id,
                 'notes' => $request->notes,
             ]);

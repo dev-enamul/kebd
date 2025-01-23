@@ -10,18 +10,16 @@ class DistrictApiController extends Controller
 {
     public function __invoke(Request $request)
     {
-        try {  
-            $keyword = $request->input('keyword', ''); 
-            $divisionId = $request->input('division_id', null); 
- 
+        try {
+            $keyword = $request->input('keyword', '');
+            $divisionId = $request->input('division_id', null);
             $data = District::select('id', 'name')
-                ->when($divisionId, function ($query) use ($divisionId) { 
+                ->when($divisionId, function ($query) use ($divisionId) {
                     return $query->where('division_id', $divisionId);
                 })
                 ->where(function ($query) use ($keyword) {  
                     $query->where('name', 'LIKE', '%' . $keyword . '%');
-                })
-                ->take(10)
+                }) 
                 ->get();  
  
             if ($data->isEmpty()) {

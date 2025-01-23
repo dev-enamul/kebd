@@ -18,7 +18,6 @@ class CountryApiController extends Controller
                     $query->where('name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('nationality', 'LIKE', '%' . $keyword . '%');
                 })
-                ->take(10)
                 ->get();  
             if ($data->isEmpty()) {
                 return error_response('No countries found', 404);

@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('sales_pipelines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
-            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-            $table->json('service_ids')->nullable();
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade'); 
             $table->foreignId('followup_categorie_id')->constrained('followup_categories');
         
             $table->integer('purchase_probability')->nullable()->default(null)->comment("0-100%");
@@ -35,5 +34,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('leads');
-    }
+    } 
 };

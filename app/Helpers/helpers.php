@@ -17,6 +17,10 @@ if (!function_exists('success_response')) {
 if (!function_exists('error_response')) {
     function error_response( $errors = null, $statusCode = 400, $message = 'An error occurred')
     {
+        if ($statusCode == 0) {
+            $statusCode = 400;  
+        }
+        
         return response()->json([
             'success' => false,
             'message' => $message,

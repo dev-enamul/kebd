@@ -13,7 +13,7 @@ class DesignationController extends Controller
     
     public function index()
     {
-        $designatinos  = Designation::where('status',1)->select('title','slug')->get();
+        $designatinos  = Designation::where('status',1)->select('id','title','slug')->get();
         return success_response($designatinos);
     }
  

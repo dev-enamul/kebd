@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\FollowupCategory;
 use App\Models\FollowupLog;
 use App\Models\SalesPipeline;
+use App\Models\SalesPipelineService;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserContact;
@@ -23,16 +24,42 @@ class LeadController extends Controller
     public function index(Request $request)
     {
         try {
-            $category = $request->category_id;  
-            $query = SalesPipeline::whereIn('status', ['Active', 'Waiting']);  
+            $category = $request->category_id;
+            $status = $request->status??"Active";
+            $query = SalesPipeline::where('status', $status);
+            
             if ($category) {
-                $query->where('followup_categorie_id', $category);  
+                $query->where('followup_categorie_id', $category);
             } 
-            $datas = $query->get(); 
+            $datas = $query->with([
+                'user:id,name,email,phone',
+                'services:id,title'  
+            ])
+            ->select('next_followup_date', 'last_contacted_at')  
+            ->get(); 
+            $datas = $datas->map(function ($salesPipeline) { 
+                $user = $salesPipeline->user; 
+                $services = $salesPipeline->services->map(function ($service) {
+                    return [
+                        'id' => $service->id,
+                        'service_name' => $service->title,  
+                    ];
+                }); 
+                return [
+                    // 'user_name' => $user->name,
+                    'user_email' => $user->email,
+                    'user_phone' => $user->phone,
+                    'next_followup_date' => $salesPipeline->next_followup_date,
+                    'last_contacted_at' => $salesPipeline->last_contacted_at,
+                    'services' => $services,
+                ];
+            });
+        
             return success_response($datas);
         } catch (Exception $e) {
-            return error_response($e->getMessage(), $e->getCode());
+            return error_response($e->getMessage(), 500);
         }
+        
     }
     
     public function store(CustomerStoreRequest $request)
@@ -72,6 +99,17 @@ class LeadController extends Controller
                 'followup_categorie_id' => $followup_category->id,
                 'assigned_to' => $request->assigned_to,
             ]);
+
+            if(isset($request->service_ids) && count($request->service_ids)>0){
+                foreach($request->service_ids as $service_id){
+                    SalesPipelineService::create([
+                        'user_id' =>  $user->id,
+                        'customer_id' => $customer->id,
+                        'sales_pipeline_id' => $pipeline->id,
+                        'service_id' => $service_id,
+                    ]);
+                }
+            }
 
             FollowupLog::create([
                 'user_id' => $user->id,

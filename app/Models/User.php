@@ -85,6 +85,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }  
+
+    public function salesPipelines()
+    {
+        return $this->hasMany(SalesPipeline::class);
+    }
  
  
 

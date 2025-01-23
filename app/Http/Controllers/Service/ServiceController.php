@@ -14,7 +14,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::where('status',1)->select('title','slug','description','regular_price','sell_price')->get();
+        $services = Service::where('status',1)->select('id','title','slug','description','regular_price','sell_price')->get();
         return success_response($services);
     }
   

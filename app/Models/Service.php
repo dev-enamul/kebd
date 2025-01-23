@@ -22,5 +22,10 @@ class Service extends Model
         'deleted_by',
     ];
 
+    public function salesPipelines()
+    {
+        return $this->belongsToMany(SalesPipeline::class, 'sales_pipeline_service', 'service_id', 'sales_pipeline_id');
+    }
+
   
 }
