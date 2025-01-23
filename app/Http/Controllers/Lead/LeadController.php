@@ -22,33 +22,51 @@ class LeadController extends Controller
 {
     
     public function index(Request $request)
-    {
+    { 
         try {
-            $category = $request->category_id;
-            $status = $request->status??"Active";
-            $query = SalesPipeline::where('status', $status);
             
+            $category = $request->category_id;
+            $status = $request->status ?? "Active";
+            
+            $query = SalesPipeline::query()
+                ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
+                ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
+                ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
+                ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at', 
+                         'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
+                         'services.id as service_id', 'services.title as service_name')
+                ->where('sales_pipelines.status', $status);
+        
             if ($category) {
-                $query->where('followup_categorie_id', $category);
-            } 
-            $datas = $query->with([
-                'user:id,name,email,phone',
-                'services:id,title'  
-            ])
-            ->select('next_followup_date', 'last_contacted_at')  
-            ->get(); 
-            $datas = $datas->map(function ($salesPipeline) { 
-                $user = $salesPipeline->user; 
-                $services = $salesPipeline->services->map(function ($service) {
+                $query->where('sales_pipelines.followup_categorie_id', $category);
+            }  
+
+            $user = User::find(Auth::user()->id);
+            $designation = @$user->employee->designation->slug;
+            if($designation!="admin"){
+                $query->where('sales_pipelines.assigned_to', $user->id);
+            }
+
+        
+            $datas = $query->get();
+        
+            // Grouping the data by `lead_id` to ensure only one row per SalesPipeline
+            $datas = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
+                $salesPipeline = $salesPipelines->first();  // Get the first row (as all rows have the same lead_id)
+                
+                // Group the services related to the salesPipeline
+                $services = $salesPipelines->map(function ($pipeline) {
                     return [
-                        'id' => $service->id,
-                        'service_name' => $service->title,  
+                        'id' => $pipeline->service_id,
+                        'name' => $pipeline->service_name,
                     ];
-                }); 
+                });
+        
                 return [
-                    // 'user_name' => $user->name,
-                    'user_email' => $user->email,
-                    'user_phone' => $user->phone,
+                    'id' => $salesPipeline->lead_id,
+                    'name' => $salesPipeline->user_name,
+                    'email' => $salesPipeline->user_email,
+                    'phone' => $salesPipeline->user_phone,
                     'next_followup_date' => $salesPipeline->next_followup_date,
                     'last_contacted_at' => $salesPipeline->last_contacted_at,
                     'services' => $services,
@@ -59,6 +77,8 @@ class LeadController extends Controller
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
         }
+        
+        
         
     }
     

@@ -11,7 +11,7 @@ class FollowupController extends Controller
     public function index(Request $request){  
     } 
 
-    public function store(Request $request){ 
+    public function store(Request $request){
         $pipeline = SalesPipeline::find($request->lead_id);
         if(!$pipeline){
             return error_response("Invalid Lead ID", 404);
@@ -21,8 +21,6 @@ class FollowupController extends Controller
             'followup_categorie_id' => $request->followup_categorie_id,
             'followup_status'       => $request->followup_status,
             'last_updated_by'       => auth()->user()->id,
-        ]);
-        
-
+        ]);  
     }
 }

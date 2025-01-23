@@ -71,31 +71,34 @@ class EmployeeController extends Controller
                 'linkedin'          => $request->linkedin,
             ]);
  
-            UserAddress::create([
-                'user_id' => $user->id,
-                'address_type'      => "permanent",
-                'country'           => $request->permanent_country,
-                'division'          => $request->permanent_division,
-                'district'          => $request->permanent_district,
-                'upazila_or_thana'  => $request->permanent_upazila_or_thana,
-                "zip_code"          => $request->permanent_zip_code,
-                'address'           => $request->permanent_address, 
-                "is_same_present_permanent" => $request->is_same_present_permanent
-            ]);
-
-            if(!$request->is_same_present_permanent){
+            if(isset($request->permanent_country) || isset($request->permanent_zip_code) ||  isset($request->permanent_address)){
                 UserAddress::create([
                     'user_id' => $user->id,
-                    'address_type'      => "present",
-                    'country'           => $request->present_country,
-                    'division'          => $request->present_division,
-                    'district'          => $request->present_district,
-                    'upazila_or_thana'  => $request->present_upazila_or_thana,
-                    "zip_code"          => $request->present_zip_code,
-                    'address'           => $request->present_address, 
+                    'address_type'      => "permanent",
+                    'country'           => $request->permanent_country,
+                    'division'          => $request->permanent_division,
+                    'district'          => $request->permanent_district,
+                    'upazila_or_thana'  => $request->permanent_upazila_or_thana,
+                    "zip_code"          => $request->permanent_zip_code,
+                    'address'           => $request->permanent_address, 
                     "is_same_present_permanent" => $request->is_same_present_permanent
                 ]);
+    
+                if(!$request->is_same_present_permanent){
+                    UserAddress::create([
+                        'user_id' => $user->id,
+                        'address_type'      => "present",
+                        'country'           => $request->present_country,
+                        'division'          => $request->present_division,
+                        'district'          => $request->present_district,
+                        'upazila_or_thana'  => $request->present_upazila_or_thana,
+                        "zip_code"          => $request->present_zip_code,
+                        'address'           => $request->present_address, 
+                        "is_same_present_permanent" => $request->is_same_present_permanent
+                    ]);
+                }
             }
+            
  
             $employee = Employee::create([
                 'user_id' => $user->id,

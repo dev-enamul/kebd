@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('zip_code')->nullable(); 
             $table->text('address')->nullable(); 
 
-            $table->boolean('is_same_present_permanent')->default(1)->comment('0=Diff Address , 1  = Same Address');
+            $table->boolean('is_same_present_permanent')->nullable()->comment('0=Diff Address , 1  = Same Address');
             $table->timestamps();
         });
     }
