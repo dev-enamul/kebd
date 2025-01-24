@@ -28,7 +28,16 @@ use Illuminate\Support\Facades\Route;
 |
 */ 
 
-Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::options('/{any}', function () {
+    return response()->json([], 204, [
+        'Access-Control-Allow-Origin' => 'https://canary-crm.vercel.app', // Allow your frontend domain
+        'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN',
+    ]);
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+})->where('any', '.*');
+
+
 Route::get('roles',RoleApiController::class);
 
 // Location 
