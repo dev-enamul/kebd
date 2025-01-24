@@ -3,24 +3,122 @@
 namespace App\Http\Controllers\Followup;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FollowupRequest;
+use App\Models\FollowupLog;
 use App\Models\SalesPipeline;
+use App\Models\SalesPipelineService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FollowupController extends Controller
 {
-    public function index(Request $request){  
-    } 
+    public function index(Request $request)
+    {
+        try {
+            $lead_id = $request->lead_id;
+            $customer_id = $request->customer_id;
+            $user_id = $request->user_id; 
+            $query = FollowupLog::query();
 
-    public function store(Request $request){
-        $pipeline = SalesPipeline::find($request->lead_id);
-        if(!$pipeline){
-            return error_response("Invalid Lead ID", 404);
+            if ($lead_id) {
+                $query->where('pipeline_id', $lead_id);
+            }
+
+            if ($customer_id) {
+                $query->where('customer_id', $customer_id);
+            }
+
+            if ($user_id) {
+                $query->where('user_id', $user_id);
+            }
+
+            // Eager load followupCategory relationship
+            $datas = $query->with('followupCategory')
+                        ->get()
+                        ->map(function ($followup) {
+                            return [
+                                'id' => $followup->id,
+                                'followup_category' => $followup->followupCategory->title ?? "", 
+                                'next_followup_date' => $followup->next_followup_date,
+                                'notes' => $followup->notes, 
+                            ];
+                        });
+
+            return success_response($datas, 200);
+        } catch (Exception $e) {
+            return error_response($e->getMessage(), 500);
         }
-        $pipeline->update([
-            'service_ids'           => $request->service_ids,
-            'followup_categorie_id' => $request->followup_categorie_id,
-            'followup_status'       => $request->followup_status,
-            'last_updated_by'       => auth()->user()->id,
-        ]);  
     }
+
+
+
+    public function store(FollowupRequest $request){ 
+        DB::beginTransaction(); 
+        try {
+            $pipeline = SalesPipeline::findOrFail($request->lead_id);
+
+            $pipeline->update([
+                'followup_categorie_id' => $request->followup_categorie_id,
+                'purchase_probability' => $request->purchase_probability,
+                'price' => $request->price,
+                'next_followup_date' => $request->next_followup_date,
+                'last_contacted_at' => now(),
+            ]);
+
+            $this->createSalesPipelineService($pipeline, $request->service_ids ?? []);
+
+            FollowupLog::create([
+                'user_id' => $pipeline->user_id,
+                'customer_id' => $pipeline->customer_id,
+                'pipeline_id' => $pipeline->id,
+                'followup_categorie_id' => $request->followup_categorie_id,
+                'purchase_probability' => $request->purchase_probability,
+                'price' => $request->price,
+                'next_followup_date' => $request->next_followup_date,
+                'notes' => $request->notes,
+                'created_by' => Auth::user()->id
+            ]); 
+            DB::commit(); 
+            return success_response("Follow-up created successfully", 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return error_response($e->getMessage(), 500);
+        }
+
+    }
+
+    public function createSalesPipelineService($pipeline, $newServiceIds)
+    {
+        try {
+            $currentServiceIds = SalesPipelineService::where('sales_pipeline_id', $pipeline->id)
+                ->pluck('service_id')
+                ->toArray();
+    
+            $newServiceIds = $newServiceIds ?? [];
+            $serviceIdsToAdd = array_diff($newServiceIds, $currentServiceIds);
+            $serviceIdsToRemove = array_diff($currentServiceIds, $newServiceIds);
+    
+            // Delete services no longer needed
+            if (!empty($serviceIdsToRemove)) {
+                SalesPipelineService::where('sales_pipeline_id', $pipeline->id)
+                    ->whereIn('service_id', $serviceIdsToRemove)
+                    ->delete();
+            }
+    
+            // Add new services
+            foreach ($serviceIdsToAdd as $service_id) {
+                SalesPipelineService::create([
+                    'user_id' => $pipeline->user_id,
+                    'customer_id' => $pipeline->customer_id,
+                    'sales_pipeline_id' => $pipeline->id,
+                    'service_id' => $service_id,
+                ]);
+            }
+        } catch (Exception $e) {
+            throw new Exception("Failed to update services: " . $e->getMessage());
+        }
+    }
+    
 }

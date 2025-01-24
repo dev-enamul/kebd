@@ -65,7 +65,7 @@ class LeadController extends Controller
                     'last_contacted_at' => $salesPipeline->last_contacted_at,
                     'services' => $services,
                 ];
-            })->values()->all(); // Convert to array
+            })->values()->all();  
             
             return success_response($datas);
         } catch (Exception $e) {

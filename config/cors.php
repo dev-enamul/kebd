@@ -17,18 +17,18 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['*'], 
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://canary-crm.vercel.app'], 
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [], 
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Authorization', 'X-Requested-With'],
 
-    'max_age' => 0,
+    'max_age' => 3600, 
 
-    'supports_credentials' => false,
+    'supports_credentials' => true, 
 
 ];
