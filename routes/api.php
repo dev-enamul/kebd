@@ -34,10 +34,10 @@ Route::options('/{any}', function () {
         'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN',
     ]);
-    Route::post('login', [AuthController::class, 'login'])->name('login');
+    
 })->where('any', '.*');
 
-
+Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('roles',RoleApiController::class);
 
 // Location 
