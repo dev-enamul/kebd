@@ -26,16 +26,7 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/ 
-
-Route::options('/{any}', function () {
-    return response()->json([], 204, [
-        'Access-Control-Allow-Origin' => 'https://canary-crm.vercel.app', // Allow your frontend domain
-        'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With, X-XSRF-TOKEN',
-    ]);
-    
-})->where('any', '.*');
+*/  
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('roles',RoleApiController::class);
