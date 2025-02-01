@@ -56,6 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('file',FileControllr::class);
 
     Route::resource('lead', LeadController::class);
+    Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
     Route::post('lead-assign-to',LeadAssignController::class);
     Route::resource('followup', FollowupController::class);
 

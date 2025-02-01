@@ -181,5 +181,10 @@ class LeadController extends Controller
             DB::rollBack();  
             return error_response($e->getMessage(), 500);
         }
+    } 
+
+    public function profile($id){
+        $lead = SalesPipeline::find($id);
+        $user = User::find($lead->user_id)->with(['']);
     }
 }
