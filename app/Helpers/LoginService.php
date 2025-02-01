@@ -16,9 +16,9 @@ class LoginService {
     {
         $token = $user->createToken('authToken')->plainTextToken;
  
-        $permissions = $user->employee->designation->slug == 'admin'
-            ? Permission::pluck('slug')  
-            : $user->employee->designation->permission->pluck('slug'); 
+        // $permissions = $user->employee->designation->slug == 'admin'
+        //     ? Permission::pluck('slug')  
+        //     : $user->employee->designation->permission->pluck('slug'); 
      
         $data = [
             'token' => $token,
@@ -27,7 +27,7 @@ class LoginService {
                 'email' => $user->email, 
                 'designation' => $user->employee->designation,
             ],
-            'permissions' => $permissions,
+            // 'permissions' => $permissions,
         ];   
         return success_response($data, 'User authenticated successfully.'); 
     }

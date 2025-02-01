@@ -1,8 +1,5 @@
 <?php
-
-use App\Helpers\ReportingService;
-use App\Http\Controllers\Admin\Admission\InterviewController; 
-use App\Models\User;
+ 
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/',function(){
-    dd('yes');
+    dd('no');
 });
  

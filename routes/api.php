@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Employee\DesignationController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
+use App\Http\Controllers\Admin\Employee\EmployeeUpdateController;
 use App\Http\Controllers\Auth\AuthController; 
 use App\Http\Controllers\Common\CountryApiController; 
 use App\Http\Controllers\Common\DistrictApiController;
@@ -9,10 +10,13 @@ use App\Http\Controllers\Common\DivisionApiController;
 use App\Http\Controllers\Common\RoleApiController;
 use App\Http\Controllers\Common\UnionApiController;
 use App\Http\Controllers\Common\UpazilaApiController;
+use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
+use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
 use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\Setting\FollowupCategoryController;
+use App\Http\Controllers\User\EducationController;
 use App\Models\FollowupCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,11 +44,20 @@ Route::get('unions',UnionApiController::class);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
-    Route::resource('service', ServiceController::class); 
-    Route::resource('employee', EmployeeController::class);
-    Route::resource('lead', LeadController::class);
-    Route::resource('followup', FollowupController::class);
+    Route::resource('service', ServiceController::class);  
 
+    // Employee 
+    Route::resource('employee', EmployeeController::class);
+    Route::post('update-employee-designation',[EmployeeUpdateController::class,'updateDesignation']);
+    Route::post('update-employee-reporting',[EmployeeUpdateController::class,'updateReporting']);
+
+    // User update 
+    Route::resource('education',EducationController::class);
+    Route::resource('file',FileControllr::class);
+
+    Route::resource('lead', LeadController::class);
+    Route::post('lead-assign-to',LeadAssignController::class);
+    Route::resource('followup', FollowupController::class);
 
     // Setting 
     Route::resource('followup-category', FollowupCategoryController::class);

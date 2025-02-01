@@ -97,7 +97,7 @@ class LeadController extends Controller
                 'blood_group'   => $request->blood_group, 
                 'gender'        => $request->gender, 
                 'created_by'    => Auth::user()->id,
-            ]); 
+            ]);
 
             $customer = Customer::create([ 
                 'user_id' => $user->id,

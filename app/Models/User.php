@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasOne(UserContact::class, 'user_id');
     }
 
+    public function education()
+    {
+        return $this->hasOne(UserEducation::class, 'user_id');
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
