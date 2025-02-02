@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin\Employee;
 
 use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\DesignationLog;
+use App\Models\SalesPipeline;
 use App\Models\User;
 use App\Models\UserReporting;
 use Carbon\Carbon;
@@ -54,22 +56,23 @@ class EmployeeUpdateController extends Controller
     public function updateReporting(Request $request)
     {
         try { 
-            $user_id = $request->user_id;
-            $reporting_user_id = $request->reporting_user_id;
-            $user = User::find($user_id);  
+            $lead = SalesPipeline::find($request->id); 
+            $reporting_user_id = $request->assigned_to;
+            $user = $lead->user();
+            if(!$user){
+                return error_response(null,"User not found",404);
+            }
             $junior_users = json_decode($user->junior_user??"[]"); 
         
             if ($junior_users && in_array($reporting_user_id, $junior_users)) {
                 return error_response("You cannot make this employee your senior because they are already your junior.");
             }
-    
-            // Update the existing reporting record
+     
             UserReporting::where('user_id', $user_id)
                 ->update([
                     'end_date' => now()->subDay() // Correctly subtract 1 day
-                ]);
-    
-            // Create a new reporting record
+                ]);  
+
             UserReporting::create([
                 'user_id' => $user->id,
                 'reporting_user_id' => $reporting_user_id,

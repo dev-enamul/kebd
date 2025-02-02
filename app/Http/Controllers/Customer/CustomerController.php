@@ -30,7 +30,7 @@ class CustomerController extends Controller
                     $q->where('total_sales', '>', 0);
                 })
                 ->with('customer') 
-                ->paginate(20)
+                ->get()
                 ->through(function ($user) {
                     return [
                         'name' => $user->name,
