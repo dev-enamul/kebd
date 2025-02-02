@@ -68,9 +68,9 @@ class EmployeeUpdateController extends Controller
                 return error_response("You cannot make this employee your senior because they are already your junior.");
             }
      
-            UserReporting::where('user_id', $user_id)
+            UserReporting::where('user_id', $user->id)
                 ->update([
-                    'end_date' => now()->subDay() // Correctly subtract 1 day
+                    'end_date' => now()->subDay() 
                 ]);  
 
             UserReporting::create([

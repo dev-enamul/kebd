@@ -100,6 +100,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(SalesPipeline::class);
     }
+
+    public function seniorUsers()
+    {
+        return $this->hasMany(User::class, 'id', 'senior_user');
+    }
  
  
 
