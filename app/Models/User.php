@@ -105,6 +105,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'id', 'senior_user');
     }
+
+    public function reportingUser()
+    {
+        return $this->hasOne(UserReporting::class, 'user_id')
+                    ->where(function ($query) {
+                        $query->whereNull('end_date')
+                            ->orWhere('end_date', '>', now());
+                    });
+    }
+
  
  
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\Employee;
 
 use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use App\Models\DesignationLog;
 use App\Models\SalesPipeline;
 use App\Models\User;
@@ -55,10 +54,15 @@ class EmployeeUpdateController extends Controller
 
     public function updateReporting(Request $request)
     {
-        try { 
-            $lead = SalesPipeline::find($request->id); 
-            $reporting_user_id = $request->reporting_user_id;
-            $user = $lead->user();
+        try {  
+            $lead_id =  $request->id;
+            $reporting_user_id = $request->assigned_to;
+            $lead = SalesPipeline::find($lead_id);
+            if(!$lead){
+                error_response(null,"Lead not found",404);
+            }
+            
+            $user = User::find($lead->user_id);
             if(!$user){
                 return error_response(null,"User not found",404);
             }

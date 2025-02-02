@@ -23,7 +23,7 @@ class FileControllr extends Controller
                 'file_name' => $request->input('name'),
                 'file_path' => $filePath,
                 'file_type' => $file->getClientMimeType(),
-                'file_size' => $file->getSize(),
+                'file_size' => 11,
             ]);
     
             return response()->json(['message' => 'File uploaded successfully', 'file' => $fileData], 201);

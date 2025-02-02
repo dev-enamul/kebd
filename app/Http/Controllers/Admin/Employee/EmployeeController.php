@@ -27,6 +27,8 @@ class EmployeeController extends Controller
             $data = User::where('user_type', 'employee')
                 ->join('employees', 'users.id', '=', 'employees.user_id')
                 ->join('designations', 'employees.designation_id', '=', 'designations.id')
+                ->join('user_reportings', 'users.id', '=', 'user_reportings.user_id')
+                ->join('users', 'user_reportings.reporting_user_id', '=', 'users.id')
                 ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
                 ->get(); 
             return success_response($data); 
