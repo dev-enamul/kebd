@@ -57,7 +57,7 @@ class EmployeeUpdateController extends Controller
     {
         try { 
             $lead = SalesPipeline::find($request->id); 
-            $reporting_user_id = $request->assigned_to;
+            $reporting_user_id = $request->reporting_user_id;
             $user = $lead->user();
             if(!$user){
                 return error_response(null,"User not found",404);
