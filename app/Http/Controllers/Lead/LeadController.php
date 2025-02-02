@@ -206,13 +206,12 @@ class LeadController extends Controller
                 'profile_image' => $user->profile_image
             ];  
 
-            return $bio;
- 
+        
             $personal = [
                 "dob" => $user->dob, 
                 'blood_group' => $user->blood_group,
                 'gender' => $user->gender, 
-                'reporting' => $user->reportingUser()->user()->name ?? "" 
+                // 'reporting' => $user->reportingUser()->user()->name ?? "" 
             ];
  
             $education = $user->educations; 
