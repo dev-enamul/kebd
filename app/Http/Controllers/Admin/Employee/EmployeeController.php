@@ -25,16 +25,10 @@ class EmployeeController extends Controller
     {
         try {
             $data = User::where('user_type', 'employee')
-            ->join('employees', 'users.id', '=', 'employees.user_id')
-            ->join('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('users as senior', function($join) {
-                $join->on(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(users.senior_user, "$[0]"))'), '=', 'senior.id');
-            })
-            ->select('users.id', 'users.name', 'users.phone', 'users.email', 'users.profile_image', 
-                    'designations.title as designation', 'senior.name as senior_name')
-            ->get();
-
-        
+                ->join('employees', 'users.id', '=', 'employees.user_id')
+                ->join('designations', 'employees.designation_id', '=', 'designations.id')
+                ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
+                ->get(); 
             return success_response($data); 
         } catch (\Exception $e) {   
             return error_response($e->getMessage(), 500);
