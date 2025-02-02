@@ -218,8 +218,7 @@ class LeadController extends Controller
             $address = $user->address;     
             $document = $user->document;    
  
-            return success_response([
-                'lead' => $lead,
+            return success_response([ 
                 'services' => $services,
                 'user' => [
                     'bio' => $bio,
