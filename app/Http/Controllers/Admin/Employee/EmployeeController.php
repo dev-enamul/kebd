@@ -28,11 +28,12 @@ class EmployeeController extends Controller
             ->join('employees', 'users.id', '=', 'employees.user_id')
             ->join('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('users as senior', function($join) {
-                $join->on(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(users.senior_user, "$[0]")'), '=', 'senior.id');
+                $join->on(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(users.senior_user, "$[0]"))'), '=', 'senior.id');
             })
             ->select('users.id', 'users.name', 'users.phone', 'users.email', 'users.profile_image', 
-                     'designations.title as designation', 'senior.name as senior_name')
+                    'designations.title as designation', 'senior.name as senior_name')
             ->get();
+
         
             return success_response($data); 
         } catch (\Exception $e) {   
