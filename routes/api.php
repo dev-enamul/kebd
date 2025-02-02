@@ -10,6 +10,7 @@ use App\Http\Controllers\Common\DivisionApiController;
 use App\Http\Controllers\Common\RoleApiController;
 use App\Http\Controllers\Common\UnionApiController;
 use App\Http\Controllers\Common\UpazilaApiController;
+use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\LeadAssignController;
@@ -44,7 +45,7 @@ Route::get('unions',UnionApiController::class);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
-    Route::resource('service', ServiceController::class);  
+    Route::resource('service', ServiceController::class);
 
     // Employee 
     Route::resource('employee', EmployeeController::class);
@@ -59,6 +60,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
     Route::post('lead-assign-to',LeadAssignController::class);
     Route::resource('followup', FollowupController::class);
+
+    // Customer  
+    Route::get('clients',[CustomerController::class,'index']);
 
     // Setting 
     Route::resource('followup-category', FollowupCategoryController::class);

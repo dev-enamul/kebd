@@ -57,7 +57,7 @@ class EmployeeUpdateController extends Controller
             $user_id = $request->user_id;
             $reporting_user_id = $request->reporting_user_id;
             $user = User::find($user_id);  
-            $junior_users = json_decode($user->junior_user, true); 
+            $junior_users = json_decode($user->junior_user??"[]"); 
         
             if ($junior_users && in_array($reporting_user_id, $junior_users)) {
                 return error_response("You cannot make this employee your senior because they are already your junior.");

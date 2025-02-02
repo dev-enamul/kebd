@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class LeadSource extends Model
 {
     use HasFactory;
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
 }

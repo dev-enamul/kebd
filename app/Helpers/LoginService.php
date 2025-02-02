@@ -17,7 +17,7 @@ class LoginService {
         $token = $user->createToken('authToken')->plainTextToken;
  
         // $permissions = $user->employee->designation->slug == 'admin'
-        //     ? Permission::pluck('slug')  
+        //     ? Permission::pluck('slug')
         //     : $user->employee->designation->permission->pluck('slug'); 
      
         $data = [

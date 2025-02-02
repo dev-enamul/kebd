@@ -13,10 +13,16 @@ class FollowupCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $categories = FollowupCategory::where('status', 1)->select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
+        try { 
+            $status = $request->status;
+            if($status ==null){
+                $categories = FollowupCategory::select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
+            }else{
+                $categories = FollowupCategory::where('status', $status)->select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
+            }
+            
             return success_response($categories);
         } catch (Exception $e) {
             return error_response($e->getMessage(), $e->getCode());
