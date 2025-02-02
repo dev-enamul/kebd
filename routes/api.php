@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('roles',RoleApiController::class);
+Route::get('clients',[CustomerController::class,'index']);
 
 // Location 
 Route::get('countries',CountryApiController::class);
@@ -62,7 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('followup', FollowupController::class);
 
     // Customer  
-    Route::get('clients',[CustomerController::class,'index']);
+ 
 
     // Setting 
     Route::resource('followup-category', FollowupCategoryController::class);

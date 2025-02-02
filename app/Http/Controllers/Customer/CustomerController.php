@@ -29,15 +29,15 @@ class CustomerController extends Controller
                 ->whereHas('customer', function ($q) {
                     $q->where('total_sales', '>', 0);
                 })
-                ->with('customer') 
+                ->with('customer')
                 ->get()
-                ->through(function ($user) {
+                ->map(function ($user) {
                     return [
                         'name' => $user->name,
                         'email' => $user->email,
                         'phone' => $user->phone,
-                        'total_sales' => $user->customer->total_sales ?? 0,
-                        'total_sales' => $user->customer->total_sales_amount ?? 0,
+                        'total_sales' => @$user->customer->total_sales ?? 0,
+                        'total_sales_amount' => @$user->customer->total_sales_amount ?? 0,
                     ];
                 });
         
@@ -45,6 +45,7 @@ class CustomerController extends Controller
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
         }
+        
         
     }
   
