@@ -205,6 +205,8 @@ class LeadController extends Controller
                 'email' => $user->email,
                 'profile_image' => $user->profile_image
             ];  
+
+            return $bio;
  
             $personal = [
                 "dob" => $user->dob, 

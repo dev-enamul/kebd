@@ -25,23 +25,11 @@ class EmployeeController extends Controller
     {
         try {
             $data = User::where('user_type', 'employee')
-            ->join('employees', 'users.id', '=', 'employees.user_id')
-            ->join('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('user_reportings', 'users.id', '=', 'user_reportings.user_id')
-            ->join('users as reporting_user', 'user_reportings.reporting_user_id', '=', 'reporting_user.id') // Aliasing the second users table
-            ->select(
-                'users.id', 
-                'users.name', 
-                'users.phone', 
-                'users.email', 
-                'users.profile_image', 
-                'designations.title as designation',
-                'reporting_user.name as reporting_user_name' // Select the reporting user's name
-            )
-            ->get();
-
-        return success_response($data);
-
+                ->join('employees', 'users.id', '=', 'employees.user_id')
+                ->join('designations', 'employees.designation_id', '=', 'designations.id')
+                ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
+                ->get(); 
+            return success_response($data); 
         } catch (\Exception $e) {   
             return error_response($e->getMessage(), 500);
         }
