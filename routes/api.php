@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('roles',RoleApiController::class);
-Route::get('clients',[CustomerController::class,'index']);
+
 
 // Location 
 Route::get('countries',CountryApiController::class);
@@ -43,6 +43,8 @@ Route::get('divisions',DivisionApiController::class);
 Route::get('districts',DistrictApiController::class);
 Route::get('upazilas',UpazilaApiController::class);
 Route::get('unions',UnionApiController::class);
+
+Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
@@ -58,11 +60,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('file',FileControllr::class);
 
     Route::resource('lead', LeadController::class);
-    Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
+   
     Route::post('lead-assign-to',LeadAssignController::class);
     Route::resource('followup', FollowupController::class);
 
-    // Customer  
+    // Customer 
+    Route::get('clients',[CustomerController::class,'index']); 
  
 
     // Setting 

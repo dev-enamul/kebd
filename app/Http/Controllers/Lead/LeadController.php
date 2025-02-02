@@ -183,8 +183,56 @@ class LeadController extends Controller
         }
     } 
 
-    public function profile($id){
-        $lead = SalesPipeline::find($id);
-        $user = User::find($lead->user_id)->with(['']);
+    public function profile($id)
+    {
+        try {  
+            $lead = SalesPipeline::find($id);  
+            if (!$lead) {
+                return error_response('Lead not found', 404);
+            }
+ 
+            $services = $lead->services;
+            $followup = $lead->followup;
+ 
+            $user = User::with(['customer', 'address', 'contact', 'educations', 'document'])
+                        ->find($lead->user_id); 
+            if (!$user) {
+                return error_response('User not found', 404);
+            }
+ 
+            $bio = [
+                "name" => $user->name,
+                'email' => $user->email,
+                'profile_image' => $user->profile_image
+            ];  
+ 
+            $personal = [
+                "dob" => $user->dob, 
+                'blood_group' => $user->blood_group,
+                'gender' => $user->gender, 
+                'reporting' => $user->reportingUser()->user()->name ?? "" 
+            ];
+ 
+            $education = $user->educations; 
+            $address = $user->address;     
+            $document = $user->document;    
+ 
+            return success_response([
+                'lead' => $lead,
+                'services' => $services,
+                'user' => [
+                    'bio' => $bio,
+                    'personal' => $personal,
+                    'education' => $education,
+                    'address' => $address,
+                    'document' => $document,
+                ],
+                'followup' => $followup, 
+            ]);
+        } catch (Exception $e) {
+            return error_response($e->getMessage(), 500);
+        }
     }
+
+
 }

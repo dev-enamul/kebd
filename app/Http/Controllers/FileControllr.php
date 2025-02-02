@@ -16,7 +16,7 @@ class FileControllr extends Controller
             $fileName = $request->input('name') . '_' . time() . '.' . $file->getClientOriginalExtension(); 
             $destinationPath = public_path('user_files');  
             $file->move($destinationPath, $fileName); 
-            $filePath = 'user_files/' . $fileName;  
+            $filePath = 'user_files/' . $fileName;
 
             $fileData = UserFile::create([
                 'user_id' => $request->user_id,
@@ -26,10 +26,9 @@ class FileControllr extends Controller
                 'file_size' => 11,
             ]);
     
-            return response()->json(['message' => 'File uploaded successfully', 'file' => $fileData], 201);
-        }
-    
-        return response()->json(['message' => 'No file uploaded.'], 400);
+            return success_response(null,"File uploaded successfully"); 
+        } 
+        return error_response("No file uploaded.");
     }
 
     public function update(Request $request, $id)

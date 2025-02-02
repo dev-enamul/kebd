@@ -25,6 +25,11 @@ class SalesPipeline extends Model
     {
         return $this->belongsTo(User::class,'user_id');
     }
+
+    public function follwoup()
+    {
+        return $this->belongsTo(FollowupLog::class,'pipeline_id');
+    }
  
     public function services()
     {

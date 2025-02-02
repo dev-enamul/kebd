@@ -76,9 +76,14 @@ class User extends Authenticatable
         return $this->hasOne(UserContact::class, 'user_id');
     }
 
-    public function education()
+    public function educations()
     {
-        return $this->hasOne(UserEducation::class, 'user_id');
+        return $this->hasMany(UserEducation::class, 'user_id');
+    }
+
+    public function document()
+    {
+        return $this->hasOne(UserFile::class, 'user_id');
     }
 
     public function createdBy()
