@@ -212,20 +212,13 @@ class LeadController extends Controller
                 'blood_group' => $user->blood_group,
                 'gender' => $user->gender, 
                 // 'reporting' => $user->reportingUser()->user()->name ?? "" 
-            ];
- 
-            $education = $user->educations; 
-            $address = $user->address;     
-            $document = $user->document;    
+            ];   
  
             return success_response([ 
                 'services' => $services,
                 'user' => [
                     'bio' => $bio,
-                    'personal' => $personal,
-                    'education' => $education,
-                    'address' => $address,
-                    'document' => $document,
+                    'personal' => $personal
                 ],
                 'followup' => $followup, 
             ]);

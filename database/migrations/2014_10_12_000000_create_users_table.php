@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->date('dob')->nullable();  
             $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable();
-            $table->enum('gender', ['male', 'female', 'others'])->nullable(); 
+            $table->enum('gender', ['male', 'female', 'others'])->nullable();
 
             $table->json('senior_user')->nullable();
             $table->json('junior_user')->nullable(); 

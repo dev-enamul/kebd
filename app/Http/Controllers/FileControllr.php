@@ -3,13 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FileUploadRequest;
+use App\Models\UserEducation;
 use App\Models\UserFile;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 
 class FileControllr extends Controller
 {  
+    public function index(Request $request){
+        try{
+            $user_id = $request->user_id;
+            $education = UserFile::where('user_id',$user_id)->get();
+            return success_response($education);
+        }catch(Exception $e){
+            return error_response($e->getMessage());
+        } 
+    }
     public function store(FileUploadRequest $request){
         if ($request->hasFile('file')) {
             $file = $request->file('file'); 

@@ -138,14 +138,44 @@ class EmployeeController extends Controller
 
     public function show(string $id)
     {
-        try{
-            $data = User::with(['employee', 'address', 'contact'])->find($id);
-            return success_response($data);
-        }catch(Exception $e){
-            return error_response($e->getMessage(), $e->getCode());
-        }
-        
+        try {    
+            $user = User::with(['employee', 'address', 'contact', 'educations', 'document'])
+                        ->find($id); 
+            if (!$user) {
+                return error_response('User not found', 404);
+            }
+  
 
+            $bio = [
+                "name" => $user->name,
+                'email' => $user->email,
+                'designation' => $user->employee->designation->title??"",
+                'profile_image' => $user->profile_image
+            ];  
+
+        
+            $personal = [
+                'is_active' => $user->employee->status??0,
+                'resigned_at' => $user->employee->resigned_at??"",
+                "dob" => $user->dob, 
+                'blood_group' => $user->blood_group,
+                'gender' => $user->gender 
+            ];
+ 
+            $education = $user->educations; 
+            $address = $user->address;     
+            $document = $user->document;    
+ 
+            return success_response([   
+                'bio' => $bio,
+                'personal' => $personal,
+                'education' => $education,
+                'address' => $address,
+                'document' => $document,
+            ]);
+        } catch (Exception $e) {
+            return error_response($e->getMessage(), 500);
+        } 
     }
 
     

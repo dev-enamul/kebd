@@ -18,6 +18,9 @@ use App\Http\Controllers\Lead\LeadController;
 use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\Setting\FollowupCategoryController;
 use App\Http\Controllers\User\EducationController;
+use App\Http\Controllers\User\UserAddressController;
+use App\Http\Controllers\User\UserContactController;
+use App\Http\Controllers\User\UserUpdateController;
 use App\Models\FollowupCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +60,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User update 
     Route::resource('education',EducationController::class);
     Route::resource('file',FileControllr::class);
+    Route::post('update-profile-picture',[UserUpdateController::class,"update_profile_picture"]);
+    Route::post('update-personal-information',[UserUpdateController::class,"update_personal_information"]);
+
+    // address 
+    Route::post('address-update',[UserAddressController::class,'update']);
+    Route::get('address/{user_id}',[UserAddressController::class,'show']); 
+    // contact   
+    Route::get('contact-data/{user_id}',[UserContactController::class,'contact_data']);
+    Route::post('upate-contact',[UserContactController::class,'update_contact']);
+    // Route::post('add-contact',[UserContactController::class,'add_contact']);
+    
+    // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
     Route::resource('lead', LeadController::class);
     Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);

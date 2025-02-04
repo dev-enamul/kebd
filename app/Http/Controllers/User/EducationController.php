@@ -13,6 +13,16 @@ use function Laravel\Prompts\error;
 
 class EducationController extends Controller
 {
+    public function index(Request $request){
+        try{
+            $user_id = $request->user_id;
+            $education = UserEducation::where('user_id',$user_id)->get();
+            return success_response($education);
+        }catch(Exception $e){
+            return error_response($e->getMessage());
+        }
+
+    }
     public function store(EducationStoreRequest $request){
         try{
             UserEducation::create([
