@@ -11,9 +11,15 @@ use Illuminate\Http\Request;
 class DesignationController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        $designatinos  = Designation::where('status',1)->select('id','title','slug')->get();
+        $status =  $request->status;
+        if(isset($status)){
+            $designatinos  = Designation::where('status',$status)->select('id','title','slug','status')->get();
+        }else{
+            $designatinos  = Designation::select('id','title','slug','status')->get();
+        }
+       
         return success_response($designatinos);
     } 
  
