@@ -32,7 +32,9 @@ class UserUpdateController extends Controller
             $user->update([
                 'profile_image' => $profilePicUrl, 
             ]); 
-            return success_response(null,"Profile picture updated"); 
+            return success_response([
+                "profile_picture" => $profilePicUrl,
+            ],"Profile picture updated"); 
     
         }catch(Exception $e){
             return error_response($e->getMessage(), 500);

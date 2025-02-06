@@ -48,3 +48,9 @@ if (!function_exists('getSlug')) {
     }
 }
 
+if (!function_exists('can')) {
+    function can($permission) {
+       
+    }
+}
+
