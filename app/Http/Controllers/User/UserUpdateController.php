@@ -63,9 +63,9 @@ class UserUpdateController extends Controller
                 'blood_group' => $user->blood_group,
                 'gender' => $user->gender 
             ]);
-            success_response(null,"Personal information updated");
+            return success_response(null,"Personal information updated");
         }catch(Exception $e){
-            error_response($e->getMessage(),500);
+            return error_response($e->getMessage(),500);
         } 
     }
 }

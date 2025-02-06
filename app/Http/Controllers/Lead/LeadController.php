@@ -198,21 +198,7 @@ class LeadController extends Controller
                         ->find($lead->user_id); 
             if (!$user) {
                 return error_response('User not found', 404);
-            }
- 
-            $bio = [
-                "name" => $user->name,
-                'email' => $user->email,
-                'profile_image' => $user->profile_image
-            ];  
-
-        
-            $personal = [
-                "dob" => $user->dob, 
-                'blood_group' => $user->blood_group,
-                'gender' => $user->gender, 
-                // 'reporting' => $user->reportingUser()->user()->name ?? "" 
-            ];   
+            } 
  
             return success_response([ 
                 'services' => $services,
