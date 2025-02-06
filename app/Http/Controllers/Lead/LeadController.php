@@ -191,7 +191,7 @@ class LeadController extends Controller
                 return error_response('Lead not found', 404);
             }
  
-            $services = $lead->services;
+            $services = $lead->services->pluck('title');
             $followup = $lead->followup;
  
             $user = User::with(['customer', 'address', 'contact', 'educations', 'document'])

@@ -143,13 +143,12 @@ class EmployeeController extends Controller
                         ->find($id); 
             if (!$user) {
                 return error_response('User not found', 404);
-            }  
-            return success_response([   
+            } 
+            return success_response([
                 "name" => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
-                'designation' => $user->employee->designation->title??"",
-                'profile_image' => $user->profile_image,
+                'designation' => $user->employee->designation->title??"", 
                 'is_active' => $user->employee->status??0,
                 'resigned_at' => $user->employee->resigned_at??"",
                 "dob" => $user->dob, 
