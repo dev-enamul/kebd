@@ -6,8 +6,7 @@ if (!function_exists('success_response')) {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data,
-            'errors' => null,
+            'data' => $data, 
             'timestamp' => now()->toIso8601String(),
             'request_id' => request()->header('X-Request-ID') ?: uniqid(),
         ], $statusCode);

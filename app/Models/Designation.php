@@ -15,7 +15,8 @@ class Designation extends Model
         'status',
     ];
 
-    public function permission(){
-        return $this->hasMany(Permission::class);
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'designation_permissions');
     }
 }

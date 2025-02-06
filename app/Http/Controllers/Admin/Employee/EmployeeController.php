@@ -144,7 +144,8 @@ class EmployeeController extends Controller
             if (!$user) {
                 return error_response('User not found', 404);
             }  
-            return success_response([   
+            return success_response([
+                "user_id" => $user->id,
                 "name" => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
