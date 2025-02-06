@@ -15,6 +15,9 @@ use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
+use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\Payment\PaymentScheduleController;
+use App\Http\Controllers\Salese\SaleseController;
 use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\Setting\FollowupCategoryController;
 use App\Http\Controllers\User\EducationController;
@@ -60,8 +63,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User update 
     Route::resource('education',EducationController::class);
     Route::resource('file',FileControllr::class);
-    Route::post('update-profile-picture',[UserUpdateController::class,"update_profile_picture"]);
-    Route::post('update-personal-information',[UserUpdateController::class,"update_personal_information"]);
+    Route::post('profile-picture-update',[UserUpdateController::class,"update_profile_picture"]);
+    Route::post('bio-update',[UserUpdateController::class,"bio_update"]);
 
     // address 
     Route::post('address-update',[UserAddressController::class,'update']);
@@ -69,8 +72,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // contact   
     Route::get('contact-data/{user_id}',[UserContactController::class,'contact_data']);
     Route::post('upate-contact',[UserContactController::class,'update_contact']);
-    // Route::post('add-contact',[UserContactController::class,'add_contact']);
-    
+    // Route::post('add-contact',[UserContactController::class,'add_contact']); 
     // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
     Route::resource('lead', LeadController::class);
@@ -81,6 +83,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Customer 
     Route::get('clients',[CustomerController::class,'index']); 
+
+    // Salese 
+    Route::resource('salese',SaleseController::class);
+    Route::resource('payment-schedule',PaymentScheduleController::class);
+    Route::get('pay-now',[PaymentController::class,'pay-now']);
  
 
     // Setting 
