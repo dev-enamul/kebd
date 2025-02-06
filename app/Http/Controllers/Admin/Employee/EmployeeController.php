@@ -24,9 +24,9 @@ class EmployeeController extends Controller
     public function index()
     { 
         try { 
-            if(!can("employee")){
-                return error_response(null,403,"You do not have permission to perform this action.");
-            } 
+            // if(!can("employee")){
+            //     return error_response(null,403,"You do not have permission to perform this action.");
+            // } 
             if(can('all-employeee')){
                 $data = User::where('user_type', 'employee')
                 ->join('employees', 'users.id', '=', 'employees.user_id')
@@ -45,6 +45,12 @@ class EmployeeController extends Controller
             }else{
                 $data = [];
             } 
+
+            $data = User::where('user_type', 'employee')
+            ->join('employees', 'users.id', '=', 'employees.user_id')
+            ->join('designations', 'employees.designation_id', '=', 'designations.id')
+            ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
+            ->get();  
             
             return success_response($data); 
         } catch (\Exception $e) {   
