@@ -216,11 +216,14 @@ class LeadController extends Controller
  
             return success_response([ 
                 'services' => $services,
-                'user' => [
-                    'bio' => $bio,
-                    'personal' => $personal
-                ],
-                'followup' => $followup, 
+                "name" => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'profile_image' => $user->profile_image,
+                "dob" => $user->dob, 
+                'blood_group' => $user->blood_group,
+                'gender' => $user->gender,  
+                'followup' => $followup,
             ]);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
