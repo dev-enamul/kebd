@@ -21,26 +21,30 @@ class FileControllr extends Controller
             return error_response($e->getMessage());
         } 
     }
+    
     public function store(FileUploadRequest $request){
         if ($request->hasFile('file')) {
             $file = $request->file('file'); 
             $fileName = $request->input('name') . '_' . time() . '.' . $file->getClientOriginalExtension(); 
             $destinationPath = public_path('user_files');  
-            $file->move($destinationPath, $fileName); 
-            $filePath = 'user_files/' . $fileName;
-
-            $fileData = UserFile::create([
+            $file->move($destinationPath, $fileName);  
+            $filePath = url('user_files/' . $fileName);
+    
+            UserFile::create([
                 'user_id' => $request->user_id,
                 'file_name' => $request->input('name'),
                 'file_path' => $filePath,
                 'file_type' => $file->getClientMimeType(),
-                'file_size' => 11,
+                'file_size' => $file->getSize(),  
             ]);
     
-            return success_response(null,"File uploaded successfully"); 
+            return success_response(null, "File uploaded successfully");
         } 
+    
         return error_response("No file uploaded.");
     }
+
+    
 
     public function update(Request $request, $id)
     { 
