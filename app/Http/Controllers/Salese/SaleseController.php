@@ -8,12 +8,13 @@ use App\Models\Salese;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SaleseController extends Controller
 {
-    public function index(Request $request){
+    public function index(){
         try {
-            $sales_by_user_id = $request->login_user_id; 
+            $sales_by_user_id = Auth::user()->id; 
             $datas = Salese::with(['user', 'salesByUser']) 
                 ->where('sales_by_user_id', $sales_by_user_id)
                 ->get();

@@ -4,7 +4,8 @@ use App\Http\Controllers\Admin\Employee\DesignationController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Admin\Employee\EmployeeUpdateController;
 use App\Http\Controllers\Auth\AuthController; 
-use App\Http\Controllers\Common\CountryApiController; 
+use App\Http\Controllers\Common\CountryApiController;
+use App\Http\Controllers\Common\DesignationPermissionController;
 use App\Http\Controllers\Common\DistrictApiController;
 use App\Http\Controllers\Common\DivisionApiController;
 use App\Http\Controllers\Common\RoleApiController;
@@ -53,6 +54,7 @@ Route::get('unions',UnionApiController::class);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
+    Route::resource('designation-permission',DesignationPermissionController::class);
     Route::resource('service', ServiceController::class);
 
     // Employee 
@@ -85,7 +87,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('clients',[CustomerController::class,'index']); 
 
     // Salese 
-    Route::resource('salese',SaleseController::class);
+    Route::resource('sales',SaleseController::class);
     Route::resource('payment-schedule',PaymentScheduleController::class);
     Route::get('pay-now',[PaymentController::class,'pay-now']);
  

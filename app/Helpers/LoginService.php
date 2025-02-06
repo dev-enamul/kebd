@@ -40,9 +40,9 @@ class LoginService {
                     'name' => $user->name,
                     'email' => $user->email,
                     'profile_image' => $user->profile_image,
-                    'designation' => $user->employee?->designation ?? "", 
-                ],
-                'permissions' => $permissions,
+                    'designation' => $user->employee?->designation->title ?? "", 
+                    'permissions' => $permissions,
+                ] 
             ];
     
             return success_response($data, 'User authenticated successfully.');
