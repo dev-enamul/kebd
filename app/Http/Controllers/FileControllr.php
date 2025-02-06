@@ -34,8 +34,7 @@ class FileControllr extends Controller
                 'user_id' => $request->user_id,
                 'file_name' => $request->input('name'),
                 'file_path' => $filePath,
-                'file_type' => $file->getClientMimeType(),
-                'file_size' => $file->getSize(),  
+                'file_type' => $file->getClientMimeType() 
             ]);
     
             return success_response(null, "File uploaded successfully");
