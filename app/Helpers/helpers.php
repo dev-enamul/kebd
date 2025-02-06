@@ -1,4 +1,7 @@
-<?php  
+<?php
+
+use App\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 if (!function_exists('success_response')) {
     function success_response($data = null, $message = 'Success', $statusCode = 200)
@@ -50,7 +53,15 @@ if (!function_exists('getSlug')) {
 
 if (!function_exists('can')) {
     function can($permission) {
-       
+        $user = Auth::user(); 
+        $permissions = ($user->employee && $user->employee->designation)
+            ? ($user->employee->designation->slug == 'admin'
+                ? Permission::pluck('slug')->toArray()
+                : $user->employee->designation->permissions->pluck('slug')->toArray()
+            )
+            : []; 
+        return in_array($permission, $permissions);
     }
 }
+
 

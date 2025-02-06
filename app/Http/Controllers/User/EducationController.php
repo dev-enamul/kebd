@@ -65,7 +65,6 @@ class EducationController extends Controller
                 'field_of_study' => $request->field_of_study,
                 'start_year' => $request->start_year,
                 'end_year' => $request->end_year,
-                'is_last' => $request->is_last??false,
             ]);
             return success_response("Education Information Updated Successfully");
         }catch(Exception $e){

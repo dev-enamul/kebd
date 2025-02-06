@@ -21,7 +21,6 @@ class PermissionSeeder extends Seeder
             'own-employee',
             'manage-all-employee',
             'manage-own-employee',
-            'manage-own-team-employee',
 
             'lead',
             'all-lead',

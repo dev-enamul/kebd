@@ -15,8 +15,7 @@ class DesignationController extends Controller
     {
         $designatinos  = Designation::where('status',1)->select('id','title','slug')->get();
         return success_response($designatinos);
-    }
- 
+    } 
  
     public function store(Request $request)
     {  
