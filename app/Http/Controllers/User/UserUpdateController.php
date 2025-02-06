@@ -44,9 +44,10 @@ class UserUpdateController extends Controller
             $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,',
+                'email' => 'required|email|unique:users,email,' . $request->user_id, 
                 'dob' => 'nullable|date'
             ]);
+            
             
             $user_id = $request->user_id;
             $user = User::find($user_id);
@@ -55,13 +56,12 @@ class UserUpdateController extends Controller
             }  
             
             $user->update([
-                "name" => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'phone' => $user->phone,
-                "dob" => $user->dob, 
-                'blood_group' => $user->blood_group,
-                'gender' => $user->gender 
+                "name" => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone, 
+                "dob" => $request->dob, 
+                'blood_group' => $request->blood_group,
+                'gender' => $request->gender 
             ]);
             return success_response(null,"Personal information updated");
         }catch(Exception $e){

@@ -64,7 +64,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('education',EducationController::class);
     Route::resource('file',FileControllr::class);
     Route::post('profile-picture-update',[UserUpdateController::class,"update_profile_picture"]);
-    Route::post('bio-update',[UserUpdateController::class,"bio_update"]);
+    Route::put('bio-update',[UserUpdateController::class,"bio_update"]);
 
     // address 
     Route::post('address-update',[UserAddressController::class,'update']);
