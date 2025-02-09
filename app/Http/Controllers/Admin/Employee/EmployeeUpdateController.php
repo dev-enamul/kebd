@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Employee;
 
 use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
+use App\Jobs\UpdateReportingJob;
 use App\Models\DesignationLog;
 use App\Models\SalesPipeline;
 use App\Models\User;
@@ -54,17 +55,11 @@ class EmployeeUpdateController extends Controller
 
     public function updateReporting(Request $request)
     {
-        try {  
-            $lead_id =  $request->id;
-            $reporting_user_id = $request->reporting_user_id;
-            $lead = SalesPipeline::find($lead_id);
-            if(!$lead){
-                error_response(null,"Lead not found",404);
-            }
-            
-            $user = User::find($lead->user_id);
+        try {
+            $reporting_user_id = $request->reporting_user_id; 
+            $user = User::find($request->user_id);
             if(!$user){
-                return error_response(null,"User not found",404);
+                return error_response(null,404,"User not found");
             }
             $junior_users = json_decode($user->junior_user??"[]"); 
         
@@ -82,11 +77,22 @@ class EmployeeUpdateController extends Controller
                 'reporting_user_id' => $reporting_user_id,
                 'start_date' => now()
             ]);
-    
-            // Update the senior and junior users
-            $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
-            $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
-            $user->save();
+
+            UpdateReportingJob::dispatch($reporting_user_id, $user->id);
+            
+            // $old_senior = json_decode($user->senior_user ?? "[]");
+            // $old_junior = json_decode($user->junior_user ?? "[]");  
+            // $new_senior = ReportingService::getAllSenior($user->id); 
+            // $new_junior = ReportingService::getAllJunior($user->id);
+            // $combined = array_merge([$user->id],$old_senior, $old_junior, $new_senior, $new_junior); 
+            // $unique_user = array_unique($combined, SORT_REGULAR);
+            // $unique_user_ids = array_values($unique_user); 
+            // foreach($unique_user_ids as $user_id){
+            //     $user = User::find($user_id);
+            //     $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
+            //     $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
+            //     $user->save();
+            // } 
     
             return success_response("Reporting relationship updated successfully.");
         } catch (Exception $e) { 

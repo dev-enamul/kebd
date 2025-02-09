@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Employee;
 use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeStoreResource;
+use App\Jobs\UpdateReportingJob;
 use App\Models\DesignationLog;
 use App\Models\Employee;
 use App\Models\EmployeeDesignation;
@@ -145,11 +146,8 @@ class EmployeeController extends Controller
                 'reporting_user_id' => $request->reporting_user_id,
                 'start_date' => now() 
             ]);
-
-            $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
-            $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
-            $user->save();
-            
+  
+            UpdateReportingJob::dispatch($request->reporting_user_id, $user->id);
             DB::commit();  
             return success_response(null,'Employee has been created'); 
 

@@ -49,8 +49,7 @@ Route::get('countries',CountryApiController::class);
 Route::get('divisions',DivisionApiController::class);
 Route::get('districts',DistrictApiController::class);
 Route::get('upazilas',UpazilaApiController::class);
-Route::get('unions',UnionApiController::class);
- 
+Route::get('unions',UnionApiController::class); 
  
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('designation', DesignationController::class);
