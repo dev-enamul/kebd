@@ -21,7 +21,7 @@ class SaleseController extends Controller
                 ->get();
          
             $result = $datas->map(function($sale) {
-                return [
+                return [ 
                     'user_id' => $sale->user_id,
                     'user_name' => $sale->user->name, 
                     'sales_by_user_id' => $sale->sales_by_user_id,
