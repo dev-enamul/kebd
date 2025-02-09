@@ -89,7 +89,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Salese 
     Route::resource('sales',SaleseController::class);
     Route::resource('payment-schedule',PaymentScheduleController::class);
-    Route::get('pay-now',[PaymentController::class,'pay-now']);
+    Route::post('pay-now',[PaymentController::class,'payNow']);
  
 
     // Setting 

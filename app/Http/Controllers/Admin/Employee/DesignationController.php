@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Designation;
+use App\Models\DesignationPermission;
 use App\Models\Employee;
 use Exception;
 use Illuminate\Http\Request;
@@ -76,6 +77,9 @@ class DesignationController extends Controller
             if($employee_count>0){
                 return error_response("This Designation has ".$employee_count." employees. You can't delete this desination");
             }
+            DesignationPermission::where('designation_id', $designation->id)->get()->each(function($permission) {
+                $permission->delete();
+            });             
             $designation->delete();
             return success_response("Designation deleted successfully "); 
         }catch(Exception $e){

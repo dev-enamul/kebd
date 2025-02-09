@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Salese;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Salse\SalseStoreRequest;
 use App\Models\PaymentSchedule;
 use App\Models\Salese;
 use App\Models\User;
@@ -41,24 +42,16 @@ class SaleseController extends Controller
         
     }
 
-    public function store(Request $request)
-    { 
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'sales_by_user_id' => 'required|exists:users,id',
-            'lead_id' => 'nullable|exists:sales_pipelines,id',
-            'price' => 'required|numeric',
-            'payment_schedule_amount' => 'required|numeric',
-            'payment_schedule' => 'nullable|array',
-            'payment_schedule.*.date' => 'required|date',
-            'payment_schedule.*.amount' => 'required|numeric',
-        ]);
+    public function store(SalseStoreRequest $request)
+    {  
 
         try{
+            $sales_by_user_id = Auth::user()->id; 
+
             $salese = Salese::create([
                 'user_id' => $request->user_id,
                 'sales_pipeline_id' => $request->lead_id,  
-                'sales_by_user_id' => $request->sales_by_user_id,
+                'sales_by_user_id' => $sales_by_user_id,
                 'price' => $request->price,
                 'payment_schedule_amount' => $request->payment_schedule_amount
             ]);

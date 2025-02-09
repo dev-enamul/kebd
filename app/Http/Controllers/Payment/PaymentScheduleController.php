@@ -7,21 +7,23 @@ use App\Models\PaymentSchedule;
 use App\Models\Salese;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PaymentScheduleController extends Controller
 {
 
-    public function index(Request $request){ 
-
-        $request->validate([
-            'login_user_id' => 'required|integer'
-        ]);  
+    public function index(Request $request){  
         try{
-            $login_user_id = $request->login_user_id; 
+            $status = $request->status;
+            $login_user_id = Auth::user()->id; 
             $datas = PaymentSchedule::whereHas('sale',function($q) use ($login_user_id){
                 $q->where('sales_by_user_id',$login_user_id);
-            })->get(); 
+            })
+            ->when($status,function($q) use ($status){
+                $q->where('status',$status);
+            })
+            ->get(); 
 
             $result = $datas->map(function($data) {
                 return [
@@ -54,7 +56,10 @@ class PaymentScheduleController extends Controller
         DB::beginTransaction();
     
         try { 
-            $salese = Salese::findOrFail($request->salese_id); 
+            $salese = Salese::find($request->salese_id); 
+            if(!$salese){
+                return error_response(null,404, "Sales not found");
+            }
             $total_schedule_amount = 0;
             $payment_schedule = $request->payment_schedule; 
             if (isset($payment_schedule) && count($payment_schedule) > 0) {  
@@ -63,11 +68,9 @@ class PaymentScheduleController extends Controller
                 }  
                 if (($total_schedule_amount + $salese->payment_schedule_amount) > $salese->price) {
                     return error_response(null,404,"The total payment schedule amount cannot exceed the sale price.");
-                }
-     
+                } 
                 $salese->payment_schedule_amount += $total_schedule_amount;
-                $salese->save();
-     
+                $salese->save(); 
                 foreach ($payment_schedule as $schedule) {
                     PaymentSchedule::create([
                         'user_id' => $salese->user_id,

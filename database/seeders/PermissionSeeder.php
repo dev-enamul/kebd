@@ -17,48 +17,54 @@ class PermissionSeeder extends Seeder
         $permissions = [
             'admin',
             'employee',
-            'all-employee',
             'own-employee',
-            'manage-all-employee',
+            'own-team-employee',
+            'all-employee', 
             'manage-own-employee',
+            'manage-own-team-employee',
+            'manage-all-employee', 
 
             'lead',
-            'all-lead',
             'own-lead',
+            'own-team-lead',
+            'all-lead', 
             'manage-all-lead',
             'manage-own-lead',
             'manage-own-team-lead',
 
             'client',
-            'all-client',
             'own-client',
-            'manage-all-client',
+            'own-team-client',
+            'all-client', 
             'manage-own-client',
             'manage-own-team-client',
+            'manage-all-client', 
 
             'sales',
-            'all-sales',
             'own-sales',
-            'manage-all-sales',
+            'own-team-sales',
+            'all-sales', 
             'manage-own-sales',
             'manage-own-team-sales',
+            'manage-all-sales', 
 
             'payment_schedule',
-            'all-payment-schedule',
-            'own-payment-schedule',
+            'own-team-payment-schedule',
+            'all-payment-schedule', 
             'manage-all-payment-schedule',
             'manage-own-payment-schedule',
             'manage-own-team-payment-schedule',
 
             'payment-receive',
-            'all-payment-receive',
             'own-payment-receive',
             'own-team-payment-receive',
+            'all-payment-receive',
 
             'account',
-            'all-account',
             'own-account',
-            'own-team-account'
+            'own-team-account',
+            'all-account',
+            'setting'
         ];
 
         foreach ($permissions as $permission) {
