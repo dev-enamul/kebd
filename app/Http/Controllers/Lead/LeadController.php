@@ -32,7 +32,7 @@ class LeadController extends Controller
                 ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
                 ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
                 ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at', 
-                         'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
+                         'users.id as user_id','users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
                          'services.id as service_id', 'services.title as service_name')
                 ->where('sales_pipelines.status', $status);
         
@@ -58,6 +58,7 @@ class LeadController extends Controller
             
                 return [
                     'id' => $salesPipeline->lead_id,
+                    'user_id' => $salesPipeline->user_id,
                     'name' => $salesPipeline->user_name,
                     'email' => $salesPipeline->user_email,
                     'phone' => $salesPipeline->user_phone,
