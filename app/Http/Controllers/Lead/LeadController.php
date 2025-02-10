@@ -23,7 +23,11 @@ class LeadController extends Controller
     
     public function index(Request $request)
     { 
-        try {
+        try { 
+            // if (!can("lead")) {
+            //     return permission_error_response();
+            // } 
+
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             
@@ -39,14 +43,22 @@ class LeadController extends Controller
             if ($category) {
                 $query->where('sales_pipelines.followup_categorie_id', $category);
             }  
+         
+            $authUser = User::find(Auth::user()->id);
+
+            if(can('all-lead')){
+                $datas = $query->get(); 
+            }elseif(can('own-team-lead')){
+                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                $datas = $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get(); 
+            }elseif(can('own-lead')){
+                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                $datas = $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get();
+            }else {
+                $datas = collect();
+            }  
         
-            $user = User::find(Auth::user()->id);
-            $designation = @$user->employee->designation->slug;
-            if($designation != "admin"){
-                $query->where('sales_pipelines.assigned_to', $user->id);
-            }
-        
-            $datas = $query->get(); 
+            
             $datas = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
                 $salesPipeline = $salesPipelines->first();   
                 $services = $salesPipelines->map(function ($pipeline) {

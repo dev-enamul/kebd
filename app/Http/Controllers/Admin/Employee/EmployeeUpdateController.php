@@ -19,9 +19,12 @@ use Illuminate\Support\Facades\Validator;
 class EmployeeUpdateController extends Controller
 {
     public function updateDesignation(Request $request){
+        if (!can("manage-employee")) {
+            return permission_error_response();
+        } 
+
         DB::beginTransaction(); 
-        try { 
- 
+        try {   
             $id = $request->id;
             $designation_id = $request->designation_id; 
             $auth_user = Auth::user(); 
@@ -55,6 +58,10 @@ class EmployeeUpdateController extends Controller
 
     public function updateReporting(Request $request)
     {
+        if (!can("manage-employee")) {
+            return permission_error_response();
+        } 
+
         try {
             $reporting_user_id = $request->reporting_user_id; 
             $user = User::find($request->user_id);
@@ -79,20 +86,7 @@ class EmployeeUpdateController extends Controller
             ]);
 
             UpdateReportingJob::dispatch($reporting_user_id, $user->id);
-            
-            // $old_senior = json_decode($user->senior_user ?? "[]");
-            // $old_junior = json_decode($user->junior_user ?? "[]");  
-            // $new_senior = ReportingService::getAllSenior($user->id); 
-            // $new_junior = ReportingService::getAllJunior($user->id);
-            // $combined = array_merge([$user->id],$old_senior, $old_junior, $new_senior, $new_junior); 
-            // $unique_user = array_unique($combined, SORT_REGULAR);
-            // $unique_user_ids = array_values($unique_user); 
-            // foreach($unique_user_ids as $user_id){
-            //     $user = User::find($user_id);
-            //     $user->senior_user = json_encode(ReportingService::getAllSenior($user->id));
-            //     $user->junior_user = json_encode(ReportingService::getAllJunior($user->id));
-            //     $user->save();
-            // } 
+             
     
             return success_response("Reporting relationship updated successfully.");
         } catch (Exception $e) { 

@@ -34,6 +34,16 @@ if (!function_exists('error_response')) {
     }
 }
 
+if (!function_exists('permission_error_response')) {
+    function permission_error_response( $statusCode = 403, $message = 'You do not have permission to perform this action.')
+    {  
+        return response()->json([
+            'success' => false,
+            'message' => $message
+        ], $statusCode);
+    }
+} 
+
 
 
 if (!function_exists('getSlug')) {

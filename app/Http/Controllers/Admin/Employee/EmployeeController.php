@@ -26,9 +26,9 @@ class EmployeeController extends Controller
     {
         try {
             if (!can("employee")) {
-                return error_response(null, 403, "You do not have permission to perform this action.");
+                return permission_error_response();
             }
-
+            $authUser = User::find(Auth::user()->id);
             $query = User::where('user_type', 'employee')
                 ->join('employees', 'users.id', '=', 'employees.user_id')
                 ->join('designations', 'employees.designation_id', '=', 'designations.id')
@@ -36,10 +36,13 @@ class EmployeeController extends Controller
      
             if (can('all-employee')) {
                 $data = $query->get();
-            } elseif (can('own-employee')) {
-                $juniorUserIds = json_decode(Auth::user()->junior_user ?? "[]");
+            }elseif (can('own-team-employee')) { 
+                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
                 $data = $query->whereIn('users.id', $juniorUserIds)->get();
-            } else {
+            }elseif (can('own-employee')) { 
+                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                $data = $query->whereIn('users.id', $directJuniors)->get();
+            }  else {
                 $data = [];
             } 
             return success_response($data); 
@@ -51,9 +54,10 @@ class EmployeeController extends Controller
  
     public function store(EmployeeStoreResource $request)
     {
-        if (!can("employee")) {
-            return error_response(null, 403, "You do not have permission to perform this action.");
-        }
+        if (!can("create-employee")) {
+            return permission_error_response();
+        } 
+
         DB::beginTransaction();
         try {
             $profilePicPath = null;
@@ -152,6 +156,10 @@ class EmployeeController extends Controller
 
     public function show(string $id)
     {
+        if (!can("employee")) {
+            return permission_error_response();
+        }
+
         try {    
             $user = User::with(['employee', 'address', 'contact', 'educations', 'document'])
                         ->find($id); 

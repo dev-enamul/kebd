@@ -111,6 +111,12 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'id', 'senior_user');
     }
 
+    public function directJuniors()
+    {
+        return $this->hasMany(UserReporting::class, 'reporting_user_id');
+    }
+
+
     public function reportingUser()
     {
         return $this->hasOne(UserReporting::class, 'user_id')
