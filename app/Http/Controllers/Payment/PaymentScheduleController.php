@@ -19,9 +19,9 @@ class PaymentScheduleController extends Controller
             if (!can("payment-schedule")) {
                 return permission_error_response();
             } 
-            // if (!can('all-payment-schedule') && !can('own-payment-schedule') && !can('own-team-payment-schedule')) { 
-            //     return success_response([]);
-            // }
+            if (!can('all-payment-schedule') && !can('own-payment-schedule') && !can('own-team-payment-schedule')) { 
+                return success_response([]);
+            }
 
             if (!Auth::check()) {
                 return error_response('User not authenticated.');
@@ -29,14 +29,14 @@ class PaymentScheduleController extends Controller
 
             $status = $request->status; 
             $datas = PaymentSchedule::whereHas('sale',function($q){
-                $authUser = User::find(Auth::user()->id);  
-                if(can('own-team-payment-schedule')){
-                    $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-                    $q->whereIn('sales_by_user_id',$juniorUserIds); 
-                }elseif(can('own-payment-schedule')){
-                    $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-                    $q->whereIn('sales_by_user_id',$directJuniors);  
-                } 
+                // $authUser = User::find(Auth::user()->id);  
+                // if(can('own-team-payment-schedule')){
+                //     $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                //     $q->whereIn('sales_by_user_id',$juniorUserIds); 
+                // }elseif(can('own-payment-schedule')){
+                //     $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                //     $q->whereIn('sales_by_user_id',$directJuniors);  
+                // } 
                 
             })
             ->when(isset($status),function($q) use ($status){
