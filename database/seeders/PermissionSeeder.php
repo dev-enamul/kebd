@@ -44,7 +44,7 @@ class PermissionSeeder extends Seeder
             'create-sales', 
             'manage-sales', 
 
-            'payment_schedule',
+            'payment-schedule',
             'own-payment-schedule',
             'own-team-payment-schedule',
             'all-payment-schedule', 
@@ -61,8 +61,7 @@ class PermissionSeeder extends Seeder
             'own-team-account',
             'all-account',
             'setting'
-        ];
-
+        ]; 
         foreach ($permissions as $permission) {
             DB::table('permissions')->insert([
                 'name' => $permission, 

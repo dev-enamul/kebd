@@ -24,14 +24,34 @@ class CustomerController extends Controller
      */
     public function index()
     {
+        if (!can("client")) {
+            return permission_error_response();
+        } 
         try {
-            $datas = User::where('user_type', 'customer')
+            $authUser = User::find(Auth::user()->id); 
+            $query = User::where('user_type', 'customer')
                 ->whereHas('customer', function ($q) {
                     $q->where('total_sales', '>', 0);
                 })
-                ->with('customer')
-                ->get()
-                ->map(function ($user) {
+                ->with('customer');
+
+                if(can('all-client')){
+                    $datas = $query->get(); 
+                }elseif(can('own-team-client')){
+                    $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                    $datas = $query->whereHas('salesPipelines',function($q) use ($juniorUserIds){
+                        $q->whereIn('sales_by_user_id', $juniorUserIds);
+                    })->get(); 
+                }elseif(can('own-client')){
+                    $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray(); 
+                    $datas = $query->whereHas('salesPipelines',function($q) use ($directJuniors){
+                        $q->whereIn('sales_by_user_id', $directJuniors);
+                    })->get();  
+                }else {
+                    $datas = collect();
+                }  
+                 
+                $datas->map(function ($user) {
                     return [
                         'name' => $user->name,
                         'email' => $user->email,

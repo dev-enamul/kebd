@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Salese;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Salse\SalseStoreRequest;
+use App\Models\Customer;
 use App\Models\PaymentSchedule;
 use App\Models\Salese;
 use App\Models\User;
@@ -14,11 +15,24 @@ use Illuminate\Support\Facades\Auth;
 class SaleseController extends Controller
 {
     public function index(){
-        try {
-            $sales_by_user_id = Auth::user()->id; 
-            $datas = Salese::with(['user', 'salesByUser']) 
-                ->where('sales_by_user_id', $sales_by_user_id)
-                ->get();
+        try { 
+            if (!can("sales")) {
+                return permission_error_response();
+            } 
+            $authUser = User::find(Auth::user()->id); 
+            $query = Salese::with(['user', 'salesByUser']);
+            
+            if(can('all-sales')){
+                $datas = $query->get(); 
+            }elseif(can('own-team-sales')){
+                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                $datas = $query->whereIn('sales_by_user_id', $juniorUserIds)->get(); 
+            }elseif(can('own-sales')){
+                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                $datas = $query->whereIn('sales_by_user_id', $directJuniors)->get();
+            }else {
+                $datas = collect();
+            }  
          
             $result = $datas->map(function($sale) {
                 return [ 
@@ -44,6 +58,9 @@ class SaleseController extends Controller
 
     public function store(SalseStoreRequest $request)
     {  
+        if (!can("create-sales")) {
+            return permission_error_response();
+        } 
 
         try{
             $sales_by_user_id = Auth::user()->id; 
@@ -56,8 +73,13 @@ class SaleseController extends Controller
                 'payment_schedule_amount' => $request->payment_schedule_amount
             ]);
          
-            $payment_schedule = $request->payment_schedule;
-        
+            $payment_schedule = $request->payment_schedule; 
+            $customer = Customer::where('user_id',$request->user_id);
+            if($customer){
+                $customer->total_sales = $customer->total_sales+1;
+                $customer->total_sales_amount = $customer->total_sales_amount+$request->price;
+            } 
+            
             $total_schedule_amount = 0;
             if (isset($payment_schedule) && count($payment_schedule) > 0) { 
 
@@ -90,7 +112,7 @@ class SaleseController extends Controller
     } 
 
 
-    public function delet3e(){
+    public function delete(){
 
     }
 }
