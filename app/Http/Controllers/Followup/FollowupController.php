@@ -16,6 +16,10 @@ class FollowupController extends Controller
 {
     public function index(Request $request)
     {
+        if (!can("lead")) {
+            return permission_error_response();
+        }  
+
         try {
             $lead_id = $request->lead_id;
             $customer_id = $request->customer_id;
@@ -54,7 +58,11 @@ class FollowupController extends Controller
 
 
 
-    public function store(FollowupRequest $request){ 
+    public function store(FollowupRequest $request){  
+        if (!can("manage-lead")) {
+            return permission_error_response();
+        }  
+
         DB::beginTransaction(); 
         try {
             $pipeline = SalesPipeline::findOrFail($request->lead_id);

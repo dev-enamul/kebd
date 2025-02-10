@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 class PaymentController extends Controller
 {
     public function payNow(Request $request) {
+        if (!can("payment-receive")) {
+            return permission_error_response();
+        } 
         try {
             $invoice = PaymentSchedule::find($request->id);
             $invoice->status = 1;

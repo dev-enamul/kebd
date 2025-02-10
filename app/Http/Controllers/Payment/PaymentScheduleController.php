@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Payment;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentSchedule;
 use App\Models\Salese;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +16,30 @@ class PaymentScheduleController extends Controller
 
     public function index(Request $request){  
         try{
-            $status = $request->status;
-            $login_user_id = Auth::user()->id; 
-            $datas = PaymentSchedule::whereHas('sale',function($q) use ($login_user_id){
-                $q->where('sales_by_user_id',$login_user_id);
+            if (!can("payment-schedule")) {
+                return permission_error_response();
+            } 
+            if (!can('all-payment-schedule') && !can('own-payment-schedule') && !can('own-team-payment-schedule')) { 
+                return success_response([]);
+            }
+
+            if (!Auth::check()) {
+                return error_response('User not authenticated.');
+            }
+
+            $status = $request->status; 
+            $datas = PaymentSchedule::whereHas('sale',function($q){
+                $authUser = User::find(Auth::user()->id);  
+                if(can('own-team-payment-schedule')){
+                    $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                    $q->whereIn('sales_by_user_id',$juniorUserIds); 
+                }elseif(can('own-payment-schedule')){
+                    $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                    $q->whereIn('sales_by_user_id',$directJuniors);  
+                } 
+                
             })
-            ->when($status,function($q) use ($status){
+            ->when(isset($status),function($q) use ($status){
                 $q->where('status',$status);
             })
             ->get(); 
@@ -45,7 +64,10 @@ class PaymentScheduleController extends Controller
     }
     
     
-    public function store(Request $request){
+    public function store(Request $request){ 
+        if (!can("create-payment-schedule")) {
+            return permission_error_response();
+        } 
         $request->validate([
             'salese_id' => "required",
             'payment_schedule' => 'nullable|array',
@@ -92,6 +114,9 @@ class PaymentScheduleController extends Controller
 
     public function show($id)
     {
+        if (!can("payment-schedule")) {
+            return permission_error_response();
+        } 
         try { 
             $data = PaymentSchedule::findOrFail($id); 
             $data->load('sale.salesPipeline.services'); 
