@@ -55,7 +55,7 @@ if (!function_exists('can')) {
         $user = Auth::user(); 
         if ($user && $user->employee && $user->employee->designation) { 
             $permissions = $user->employee->designation->permissions ? $user->employee->designation->permissions->pluck('slug')->toArray() : [];
-            return $permissions;
+ 
             $is_admin = in_array('admin', $permissions);
             if ($is_admin) {
                 return true;
