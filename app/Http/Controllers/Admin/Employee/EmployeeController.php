@@ -23,44 +23,37 @@ use Illuminate\Support\Facades\Storage;
 class EmployeeController extends Controller
 { 
     public function index()
-    { 
-        try { 
-            // if(!can("employee")){
-            //     return error_response(null,403,"You do not have permission to perform this action.");
-            // } 
-            if(can('all-employeee')){
-                $data = User::where('user_type', 'employee')
-                ->join('employees', 'users.id', '=', 'employees.user_id')
-                ->join('designations', 'employees.designation_id', '=', 'designations.id')
-                ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
-                ->get();  
-            }elseif(can('own-employee')){
-                $juniorUserIds = json_decode(Auth::user()->junior_user??"[]");
-                $data = User::where('user_type', 'employee')
-                ->whereIn('id',$juniorUserIds)
-                ->join('employees', 'users.id', '=', 'employees.user_id')
-                ->join('designations', 'employees.designation_id', '=', 'designations.id')
-                ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
-                ->get(); 
+    {
+        try {
+            if (!can("employee")) {
+                return error_response(null, 403, "You do not have permission to perform this action.");
+            }
 
-            }else{
+            $query = User::where('user_type', 'employee')
+                ->join('employees', 'users.id', '=', 'employees.user_id')
+                ->join('designations', 'employees.designation_id', '=', 'designations.id')
+                ->select('users.id', 'users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation');
+     
+            if (can('all-employee')) {
+                $data = $query->get();
+            } elseif (can('own-employee')) {
+                $juniorUserIds = json_decode(Auth::user()->junior_user ?? "[]");
+                $data = $query->whereIn('users.id', $juniorUserIds)->get();
+            } else {
                 $data = [];
             } 
-
-            $data = User::where('user_type', 'employee')
-            ->join('employees', 'users.id', '=', 'employees.user_id')
-            ->join('designations', 'employees.designation_id', '=', 'designations.id')
-            ->select('users.id','users.name', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation')
-            ->get();  
-            
             return success_response($data); 
-        } catch (\Exception $e) {   
+        } catch (\Exception $e) {
             return error_response($e->getMessage(), 500);
         }
     }
+    
  
     public function store(EmployeeStoreResource $request)
     {
+        if (!can("employee")) {
+            return error_response(null, 403, "You do not have permission to perform this action.");
+        }
         DB::beginTransaction();
         try {
             $profilePicPath = null;

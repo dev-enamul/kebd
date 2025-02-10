@@ -16,7 +16,7 @@ class UserReporting extends Model
         'end_date',
     ];
 
-    public function user()
+    public function reporting_user()
     {
         return $this->belongsTo(User::class, 'reporting_user_id');
     }
