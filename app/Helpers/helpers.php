@@ -53,17 +53,19 @@ if (!function_exists('getSlug')) {
 if (!function_exists('can')) {
     function can($permission) {
         $user = Auth::user(); 
-        if ($user->employee && $user->employee->designation) {
-            $permissions = $user->employee->designation->permissions->pluck('slug')->toArray(); 
-            $is_admin = in_array('admin',$permissions);
-            if($is_admin){
+        if ($user && $user->employee && $user->employee->designation) { 
+            $permissions = $user->employee->designation->permissions ? $user->employee->designation->permissions->pluck('slug')->toArray() : [];
+            return $permissions;
+            $is_admin = in_array('admin', $permissions);
+            if ($is_admin) {
                 return true;
-            }
+            } 
             return in_array($permission, $permissions);
-        } 
+        }  
         return false;  
     }
 }
+
 
 
 
