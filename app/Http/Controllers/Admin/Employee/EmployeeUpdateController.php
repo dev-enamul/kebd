@@ -64,7 +64,7 @@ class EmployeeUpdateController extends Controller
 
         try {
             $reporting_user_id = $request->reporting_user_id; 
-            $user = User::find($request->user_id);
+            $user = User::find($request->id);
             if(!$user){
                 return error_response(null,404,"User not found");
             }
