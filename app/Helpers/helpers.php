@@ -60,12 +60,7 @@ if (!function_exists('can')) {
                 : $user->employee->designation->permissions->pluck('slug')->toArray()
             )
             : []; 
-        $is_true =  in_array($permission, $permissions);
-        if($is_true){
-            return $is_true;
-        }else{
-            return error_response(null, 403, "You do not have permission to perform this action.");
-        }
+        return in_array($permission, $permissions);
     }
 }
 
