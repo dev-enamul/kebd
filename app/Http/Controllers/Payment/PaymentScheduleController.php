@@ -19,9 +19,9 @@ class PaymentScheduleController extends Controller
             if (!can("payment-schedule")) {
                 return permission_error_response();
             } 
-            if (!can('all-payment-schedule') && !can('own-payment-schedule') && !can('own-team-payment-schedule')) { 
-                return success_response([]);
-            }
+            // if (!can('all-payment-schedule') && !can('own-payment-schedule') && !can('own-team-payment-schedule')) { 
+            //     return success_response([]);
+            // }
 
             if (!Auth::check()) {
                 return error_response('User not authenticated.');
