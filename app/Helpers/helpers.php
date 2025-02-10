@@ -45,8 +45,7 @@ if (!function_exists('getSlug')) {
         while ($model::where($column, $slug)->exists()) {
             $slug = $originalSlug . $separator . $count;
             $count++;
-        }
-
+        } 
         return $slug;
     }
 }
@@ -54,14 +53,17 @@ if (!function_exists('getSlug')) {
 if (!function_exists('can')) {
     function can($permission) {
         $user = Auth::user(); 
-        $permissions = ($user->employee && $user->employee->designation)
-            ? ($user->employee->designation->slug == 'admin'
-                ? Permission::pluck('slug')->toArray()
-                : $user->employee->designation->permissions->pluck('slug')->toArray()
-            )
-            : []; 
-        return in_array($permission, $permissions);
+        if ($user->employee && $user->employee->designation) {
+            $permissions = $user->employee->designation->permissions->pluck('slug')->toArray(); 
+            $is_admin = in_array('admin',$permissions);
+            if($is_admin){
+                return true;
+            }
+            return in_array($permission, $permissions);
+        } 
+        return false;  
     }
 }
+
 
 
