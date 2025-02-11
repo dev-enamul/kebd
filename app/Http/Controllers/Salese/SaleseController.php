@@ -74,10 +74,11 @@ class SaleseController extends Controller
             ]);
          
             $payment_schedule = $request->payment_schedule; 
-            $customer = Customer::where('user_id',$request->user_id);
+            $customer = Customer::where('user_id',$request->user_id)->first();
             if($customer){
                 $customer->total_sales = $customer->total_sales+1;
                 $customer->total_sales_amount = $customer->total_sales_amount+$request->price;
+                $customer->save();
             } 
             
             $total_schedule_amount = 0;
