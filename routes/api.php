@@ -16,6 +16,7 @@ use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
+use App\Http\Controllers\Lead\RejectionController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Payment\PaymentScheduleController;
 use App\Http\Controllers\Salese\SaleseController;
@@ -83,6 +84,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
    
     Route::post('lead-assign-to',LeadAssignController::class);
     Route::resource('followup', FollowupController::class);
+
+    Route::resource('lead-rejection',RejectionController::class);
 
     // Customer 
     Route::get('clients',[CustomerController::class,'index']); 
