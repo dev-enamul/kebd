@@ -27,25 +27,102 @@ class LeadController extends Controller
             if (!can("lead")) {
                 return permission_error_response();
             }
-    
+
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
-    
+
             // Build the base query
             $query = $this->buildQuery($status, $category);
-    
+
             // Filter data based on user permissions
             $datas = $this->filterByPermissions($query, $authUser);
-    
+
             // Group, sort, and paginate the results
             $pagedData = $this->processAndPaginate($datas, $request);
-    
+
             return success_response($pagedData);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
         }
-    } 
+    }
+
+    private function buildQuery($status, $category)
+    { 
+        $query = SalesPipeline::query()
+            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
+            ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
+            ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
+            ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
+                    'users.id as user_id', 'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
+                    'services.id as service_id', 'services.title as service_name')
+            ->where('sales_pipelines.status', $status);
+
+        if ($category) {
+            $query->where('sales_pipelines.followup_categorie_id', $category);
+        }
+
+        return $query;
+    }
+
+    private function filterByPermissions($query, $authUser)
+    { 
+        if (can('all-lead')) {
+            return $query->get();
+        } elseif (can('own-team-lead')) {
+            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+            return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get();
+        } elseif (can('own-lead')) {
+            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+            return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get();
+        } else {
+            return collect();
+        }
+    }
+
+    private function processAndPaginate($datas, $request)
+    { 
+        $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
+            $salesPipeline = $salesPipelines->first();
+            $services = $salesPipelines->map(function ($pipeline) {
+                return [
+                    'id' => $pipeline->service_id,
+                    'name' => $pipeline->service_name,
+                ];
+            });
+
+            return [
+                'id' => $salesPipeline->lead_id,
+                'user_id' => $salesPipeline->user_id,
+                'name' => $salesPipeline->user_name,
+                'email' => $salesPipeline->user_email,
+                'phone' => $salesPipeline->user_phone,
+                'next_followup_date' => $salesPipeline->next_followup_date,
+                'last_contacted_at' => $salesPipeline->last_contacted_at,
+                'services' => $services,
+            ];
+        })->values(); 
+        $sortedData = $groupedData->sortBy('next_followup_date'); 
+        $perPage = $request->get('per_page', 20);
+        $currentPage = $request->get('page', 1); 
+        $pagedData = $sortedData->forPage($currentPage, $perPage);
+    
+        $totalItems = $sortedData->count();  
+        $pagination = [
+            'current_page' => $currentPage, 
+            'total_items' => $totalItems,
+            'per_page' => $perPage,
+        ];
+
+        return [
+            'data' => $pagedData,
+            'meta' => $pagination,
+        ];
+    }
+
+
+    
+    
 
     
     public function store(CustomerStoreRequest $request)
@@ -193,91 +270,7 @@ class LeadController extends Controller
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
         }
-    } 
-
-
-
-
-    private function buildQuery($status, $category)
-    { 
-        $query = SalesPipeline::query()
-            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
-            ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
-            ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
-            ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
-                     'users.id as user_id', 'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
-                     'services.id as service_id', 'services.title as service_name')
-            ->where('sales_pipelines.status', $status);
-    
-        if ($category) {
-            $query->where('sales_pipelines.followup_categorie_id', $category);
-        }
-    
-        return $query;
     }
-    
-    private function filterByPermissions($query, $authUser)
-    { 
-        if (can('all-lead')) {
-            return $query->get();
-        } elseif (can('own-team-lead')) {
-            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get();
-        } elseif (can('own-lead')) {
-            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get();
-        } else {
-            return collect();
-        }
-    }
-    
-    private function processAndPaginate($datas, $request)
-    { 
-        $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
-            $salesPipeline = $salesPipelines->first();
-            $services = $salesPipelines->map(function ($pipeline) {
-                return [
-                    'id' => $pipeline->service_id,
-                    'name' => $pipeline->service_name,
-                ];
-            });
-    
-            return [
-                'id' => $salesPipeline->lead_id,
-                'user_id' => $salesPipeline->user_id,
-                'name' => $salesPipeline->user_name,
-                'email' => $salesPipeline->user_email,
-                'phone' => $salesPipeline->user_phone,
-                'next_followup_date' => $salesPipeline->next_followup_date,
-                'last_contacted_at' => $salesPipeline->last_contacted_at,
-                'services' => $services,
-            ];
-        })->values(); 
-        $sortedData = $groupedData->sortBy('next_followup_date');
-    
-        // Get pagination parameters
-        $perPage = $request->get('per_page', 20);
-        $currentPage = $request->get('page', 1);
-    
-        // Paginate the data manually
-        $pagedData = $sortedData->forPage($currentPage, $perPage);
-    
-        // Pagination metadata
-        $totalItems = $sortedData->count();
-        $totalPages = ceil($totalItems / $perPage);
-    
-        $pagination = [
-            'current_page' => $currentPage,
-            'total_pages' => $totalPages,
-            'total_items' => $totalItems,
-            'per_page' => $perPage,
-        ];
-    
-        return [
-            'data' => $pagedData,
-            'pagination' => $pagination,
-        ];
-    } 
 
 
 }
