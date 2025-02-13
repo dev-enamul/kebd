@@ -24,9 +24,9 @@ class LeadController extends Controller
     public function index(Request $request)
     { 
         try { 
-            if (!can("lead")) {
-                return permission_error_response();
-            } 
+            // if (!can("lead")) {
+            //     return permission_error_response();
+            // } 
 
             $category = $request->category_id;
             $status = $request->status ?? "Active";
@@ -36,38 +36,38 @@ class LeadController extends Controller
                 ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
                 ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
                 ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at', 
-                         'users.id as user_id','users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
-                         'services.id as service_id', 'services.title as service_name')
+                        'users.id as user_id', 'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
+                        'services.id as service_id', 'services.title as service_name')
                 ->where('sales_pipelines.status', $status);
-        
+
             if ($category) {
                 $query->where('sales_pipelines.followup_categorie_id', $category);
             }  
-         
+
             $authUser = User::find(Auth::user()->id);
 
             if(can('all-lead')){
-                $datas = $query->get(); 
-            }elseif(can('own-team-lead')){
+                $datas = $query->get(); // Get all data (not paginated yet)
+            } elseif(can('own-team-lead')){
                 $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-                $datas = $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get(); 
-            }elseif(can('own-lead')){
+                $datas = $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get();
+            } elseif(can('own-lead')){
                 $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
                 $datas = $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get();
-            }else {
+            } else {
                 $datas = collect();
-            }  
-        
-            
-            $datas = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
-                $salesPipeline = $salesPipelines->first();   
+            }
+
+            // Group the results by 'lead_id'
+            $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
+                $salesPipeline = $salesPipelines->first(); // Get the first item of the group
                 $services = $salesPipelines->map(function ($pipeline) {
                     return [
                         'id' => $pipeline->service_id,
                         'name' => $pipeline->service_name,
                     ];
                 });
-            
+
                 return [
                     'id' => $salesPipeline->lead_id,
                     'user_id' => $salesPipeline->user_id,
@@ -78,17 +78,27 @@ class LeadController extends Controller
                     'last_contacted_at' => $salesPipeline->last_contacted_at,
                     'services' => $services,
                 ];
-            })->values()->all();  
-            
-            return success_response($datas);
+            })->values();   
+            $sortedData = $groupedData->sortBy('next_followup_date'); 
+            $perPage = 20;
+            $currentPage = $request->get('page', 1);
+            $pagedData = new \Illuminate\Pagination\LengthAwarePaginator(
+                $sortedData->forPage($currentPage, $perPage),
+                $sortedData->count(),
+                $perPage,
+                $currentPage,
+                ['path' => url()->current()]
+            );
+
+            return success_response($pagedData);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
-        }
-        
-        
-        
-        
+        }   
     }
+
+    
+    
+
     
     public function store(CustomerStoreRequest $request)
     {  

@@ -30,28 +30,19 @@ class DesignationPermissionController extends Controller
     }  
 
     public function update(Request $request, $designation_id) {
-        try {
-            // Delete the existing permissions associated with the designation
-            DesignationPermission::where('designation_id', $designation_id)->delete(); // This will delete all matching records directly
-    
-            // Get the new permissions from the request
-            $permissions = $request->permissions;
-            
-            // Check if permissions are provided
-            if (isset($permissions) && count($permissions) > 0) {
-                // Insert the new permissions for the designation
+        try { 
+            DesignationPermission::where('designation_id', $designation_id)->delete(); 
+            $permissions = $request->permissions; 
+            if (isset($permissions) && count($permissions) > 0) { 
                 foreach ($permissions as $permission) {
                     DesignationPermission::create([
                         'designation_id' => $designation_id,
                         'permission_id'  => $permission,
                     ]);
                 }
-            }
-    
-            // Return success response
+            } 
             return success_response(null, "Designation updated");
-        } catch (Exception $e) {
-            // Return error response in case of exception
+        } catch (Exception $e) { 
             return error_response($e->getMessage());
         }
     }
