@@ -116,6 +116,11 @@ class User extends Authenticatable
         return $this->hasMany(UserReporting::class, 'reporting_user_id');
     }
 
+    public function userEnglishes()
+    {
+        return $this->hasMany(UserEnglish::class);
+    }
+
 
     public function reportingUser()
     {

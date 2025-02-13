@@ -24,10 +24,9 @@ class LeadController extends Controller
     public function index(Request $request)
     { 
         try { 
-            // if (!can("lead")) {
-            //     return permission_error_response();
-            // } 
-
+            if (!can("lead")) {
+                return permission_error_response();
+            }  
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             

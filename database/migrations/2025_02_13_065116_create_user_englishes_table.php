@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('user_englishes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
+            $table->string('certificate_name')->nullable();
+            $table->string('score')->nullable();
             $table->timestamps();
         });
     }

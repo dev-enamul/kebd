@@ -7,6 +7,7 @@ use App\Http\Requests\Salse\SalseStoreRequest;
 use App\Models\Customer;
 use App\Models\PaymentSchedule;
 use App\Models\Salese;
+use App\Models\SalesPipeline;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -60,11 +61,18 @@ class SaleseController extends Controller
     {  
         if (!can("create-sales")) {
             return permission_error_response();
-        } 
-
+        }  
         try{
-            $sales_by_user_id = Auth::user()->id; 
+            // Update lead status 
+            if(isset($request->lead_id) && $request->lead_id !=null){
+                $lead = SalesPipeline::find($request->lead_id);
+                if($lead){
+                    $lead->status = "Salsed";
+                    $lead->save();
+                }
+            }
 
+            $sales_by_user_id = Auth::user()->id;  
             $salese = Salese::create([
                 'user_id' => $request->user_id,
                 'sales_pipeline_id' => $request->lead_id,  

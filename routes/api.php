@@ -24,6 +24,7 @@ use App\Http\Controllers\Setting\FollowupCategoryController;
 use App\Http\Controllers\User\EducationController;
 use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\User\UserContactController;
+use App\Http\Controllers\User\UserEnglishController;
 use App\Http\Controllers\User\UserUpdateController;
 use App\Models\FollowupCategory;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User update 
     Route::resource('education',EducationController::class);
     Route::resource('file',FileControllr::class);
+    Route::resource('english-score',UserEnglishController::class);
     Route::post('profile-picture-update',[UserUpdateController::class,"update_profile_picture"]);
     Route::put('bio-update',[UserUpdateController::class,"bio_update"]);
 
