@@ -229,7 +229,7 @@ class LeadController extends Controller
     } 
 
     public function profile($id)
-    { 
+    {
         if (!can("lead") && !can("client") ) {
             return permission_error_response();
         } 

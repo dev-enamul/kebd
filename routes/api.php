@@ -3,7 +3,8 @@
 use App\Http\Controllers\Admin\Employee\DesignationController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Admin\Employee\EmployeeUpdateController;
-use App\Http\Controllers\Auth\AuthController; 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Bank\BankController;
 use App\Http\Controllers\Common\CountryApiController;
 use App\Http\Controllers\Common\DesignationPermissionController;
 use App\Http\Controllers\Common\DistrictApiController;
@@ -99,6 +100,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Setting 
     Route::resource('followup-category', FollowupCategoryController::class);
+    Route::resource('bank', BankController::class);
 });
 
 

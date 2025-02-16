@@ -52,10 +52,11 @@ class CustomerController extends Controller
                 }  
                  
                 $datas->map(function ($user) {
-                    return [
+                    return [ 
                         'name' => $user->name,
                         'email' => $user->email,
                         'phone' => $user->phone,
+                        'profile_image' => $user->profile_image,
                         'total_sales' => @$user->customer->total_sales ?? 0,
                         'total_sales_amount' => @$user->customer->total_sales_amount ?? 0,
                     ];

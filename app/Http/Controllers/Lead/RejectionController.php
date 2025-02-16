@@ -162,6 +162,5 @@ class RejectionController extends Controller
             DB::rollBack();
             return error_response($e->getMessage(), 500);
         }
-    }
-    
+    } 
 }
