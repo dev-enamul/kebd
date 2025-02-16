@@ -59,7 +59,7 @@ class FollowupController extends Controller
 
 
     public function store(FollowupRequest $request){  
-        if (!can("manage-lead")) {
+        if (!can("create-lead")) {
             return permission_error_response();
         }  
 

@@ -30,6 +30,13 @@ class PermissionSeeder extends Seeder
             'create-lead',
             'manage-lead', 
 
+            'rejection',
+            'own-rejection',
+            'own-team-rejection',
+            'all-rejection', 
+            'create-rejection',
+            'manage-rejection', 
+
             'client',
             'own-client',
             'own-team-client',

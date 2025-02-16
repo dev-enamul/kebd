@@ -86,6 +86,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('followup', FollowupController::class);
 
     Route::resource('lead-rejection',RejectionController::class);
+    Route::post('rejection-to-lead',[RejectionController::class,'rejectToLead']);
 
     // Customer 
     Route::get('clients',[CustomerController::class,'index']); 

@@ -19,26 +19,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class LeadController extends Controller
-{
-    
+{ 
     public function index(Request $request)
     {
         try {
             if (!can("lead")) {
                 return permission_error_response();
-            }
-
+            } 
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
-
-            // Build the base query
+ 
             $query = $this->buildQuery($status, $category);
-
-            // Filter data based on user permissions
-            $datas = $this->filterByPermissions($query, $authUser);
-
-            // Group, sort, and paginate the results
+            $datas = $this->filterByPermissions($query, $authUser); 
             $pagedData = $this->processAndPaginate($datas, $request);
 
             return success_response($pagedData);
