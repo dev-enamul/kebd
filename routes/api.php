@@ -18,6 +18,7 @@ use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
 use App\Http\Controllers\Lead\RejectionController;
+use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Payment\PaymentScheduleController;
 use App\Http\Controllers\Salese\SaleseController;
@@ -101,6 +102,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Setting 
     Route::resource('followup-category', FollowupCategoryController::class);
     Route::resource('bank', BankController::class);
+
+    // Notification 
+    Route::resource('notification',NotificationController::class);
+    Route::get('read-notification/{id}',[NotificationController::class,'read']);
 });
 
 

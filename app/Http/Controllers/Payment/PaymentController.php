@@ -22,7 +22,7 @@ class PaymentController extends Controller
             'id' => 'required|exists:payment_schedules,id',
             'bank_id' => 'required|exists:banks,id',
         ]); 
-        DB::beginTransaction();  
+        DB::beginTransaction();
         try {
             $invoice = PaymentSchedule::findOrFail($request->id);
             if ($invoice->status == 1) {

@@ -7,6 +7,7 @@ use App\Http\Requests\CustomerStoreRequest;
 use App\Models\Customer;
 use App\Models\FollowupCategory;
 use App\Models\FollowupLog;
+use App\Models\Notification;
 use App\Models\SalesPipeline;
 use App\Models\SalesPipelineService;
 use App\Models\User;
@@ -124,6 +125,7 @@ class LeadController extends Controller
             return permission_error_response();
         } 
          
+        $authUser = Auth::user(); 
         DB::beginTransaction();
         try {
             $profilePicPath = null;
@@ -141,14 +143,14 @@ class LeadController extends Controller
                 'dob'           => $request->dob, 
                 'blood_group'   => $request->blood_group, 
                 'gender'        => $request->gender, 
-                'created_by'    => Auth::user()->id,
+                'created_by'    => $authUser->id,
             ]);
 
             $customer = Customer::create([ 
                 'user_id' => $user->id,
                 'lead_source_id'    => $request->lead_source_id,
                 'referred_by'       => $request->referred_by,  
-                'created_by' => Auth::user()->id,
+                'created_by' => $authUser->id,
             ]);
 
             $followup_category = FollowupCategory::orderBy('serial', 'asc')->first(); 
@@ -219,6 +221,15 @@ class LeadController extends Controller
                 ]);
             } 
             
+
+            if($authUser != $request->assigned_to){
+                Notification::create([
+                    'user_id' => $request->assigned_to,
+                    'title' => "New Lead Assigned!",
+                    'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
+                ]);
+                
+            }
             DB::commit();  
             return success_response(null,'Lead has been created');
 
