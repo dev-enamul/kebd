@@ -35,47 +35,20 @@ class CustomerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'              => 'required|string|max:255',
-            'email'             => 'nullable|email|unique:users,email',
-            'phone'             => 'required|string|max:20|unique:users,phone', 
-            'service_ids'       => 'nullable|array',
-            'service_ids.*'     => 'exists:services,id',   
-            'assigned_to'       => 'nullable|exists:users,id',
-            'referred_by'       => 'nullable|exists:users,id',   
-            'profile_image'     => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-            'dob'               => 'nullable|date',
-            'blood_group'       => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'gender'            => 'nullable|in:male,female,others', 
-            'lead_source_id'    => 'nullable|exists:lead_sources,id', 
-            'notes'             => 'nullable|string|max:500', 
-            
+            'project_name'      => 'required|string|max:255',
+            'client_name'       => 'required|string|max:255',
+            'service_id'       => 'required|exists:services,id', 
+            'qty'               => 'nullable|integer',  
 
-            // User Contact-related fields
-            'office_phone'      => 'nullable|string|max:20',
-            'personal_phone'    => 'nullable|string|max:20',
-            'office_email'      => 'nullable|email|max:45',
-            'personal_email'    => 'nullable|email|max:45',
-            'whatsapp'          => 'nullable|string|max:20',
-            'imo'               => 'nullable|string|max:20',
-            'facebook'          => 'nullable|string|max:100',
-            'linkedin'          => 'nullable|string|max:100',
+            'client_office_address'      => 'required|string|max:255',
+            'client_office_person'      => 'required|string|max:255',
+            'client_office_phone'      => 'required|string|max:255',
+            'client_office_email'      => 'required|string|max:255',
 
-            // User Address-related fields
-            'permanent_country' => 'nullable|string|max:255',
-            'permanent_division'=> 'nullable|string|max:255',
-            'permanent_district'=> 'nullable|string|max:255',
-            'permanent_upazila_or_thana' => 'nullable|string|max:255',
-            'permanent_zip_code'=> 'nullable|string|max:10',
-            'permanent_address' => 'nullable|string|max:500',
-            'is_same_present_permanent' => 'nullable|boolean',
-            
-            // Conditional address for present address
-            'present_country'   => 'nullable|string|max:255',
-            'present_division'  => 'nullable|string|max:255',
-            'present_district'  => 'nullable|string|max:255',
-            'present_upazila_or_thana' => 'nullable|string|max:255',
-            'present_zip_code'  => 'nullable|string|max:10',
-            'present_address'   => 'nullable|string|max:500',
+            'site_address'      => 'required|string|max:255',
+            'site_person'      => 'required|string|max:255',
+            'site_phone'      => 'required|string|max:255',
+            'site_email'      => 'required|string|max:255', 
         ];
     }
 }

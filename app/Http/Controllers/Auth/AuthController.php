@@ -22,6 +22,7 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {     
+        
         $request->authenticate(); 
         $user = Auth::user();  
         return LoginService::createResponse($user);

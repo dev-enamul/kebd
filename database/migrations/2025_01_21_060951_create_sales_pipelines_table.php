@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->foreignId('service_id')->constrained('services');
+            $table->integer('qty')->default(1);
             $table->foreignId('followup_categorie_id')->constrained('followup_categories'); 
             $table->integer('purchase_probability')->nullable()->default(null)->comment("0-100%");
             $table->decimal('price')->nullable()->default(null);

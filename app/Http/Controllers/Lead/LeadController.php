@@ -120,24 +120,26 @@ class LeadController extends Controller
 
     
     public function store(CustomerStoreRequest $request)
-    {  
+    { 
         if (!can("create-lead")) {
             return permission_error_response();
         } 
-         
+          
         $authUser = Auth::user(); 
         DB::beginTransaction();
         try {
             $profilePicPath = null;
             if ($request->hasFile('profile_image')) {
                 $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
-            }
-  
+            }  
+            
             $user = User::create([
-                'name'          => $request->name,
-                'email'         => $request->email,
-                'phone'         => $request->phone,
+                'project_name'          => $request->project_name,
+                'client_name'          => $request->client_name,
+                'email'         => $request->client_office_email,
+                'phone'         => $request->client_office_phone,
                 'password'      => Hash::make("12345678"),
+
                 'user_type'     => 'customer',  
                 'profile_image' => $profilePicPath,  
                 'dob'           => $request->dob, 
@@ -155,23 +157,24 @@ class LeadController extends Controller
 
             $followup_category = FollowupCategory::orderBy('serial', 'asc')->first(); 
             $pipeline = SalesPipeline::create([
-                'user_id' =>  $user->id,
-                'customer_id' => $customer->id,
-                'service_ids' => json_encode($request->service_ids),
+                'user_id'       => $user->id,
+                'customer_id'   => $customer->id,
+                'service_id'    => $request->service_id,
+                'qty'           => $request->qty,
                 'followup_categorie_id' => $followup_category->id,
-                'assigned_to' => $request->assigned_to,
+                'assigned_to'   => $request->assigned_to,
             ]);
 
-            if(isset($request->service_ids) && count($request->service_ids)>0){
-                foreach($request->service_ids as $service_id){
-                    SalesPipelineService::create([
-                        'user_id' =>  $user->id,
-                        'customer_id' => $customer->id,
-                        'sales_pipeline_id' => $pipeline->id,
-                        'service_id' => $service_id,
-                    ]);
-                }
-            }
+            // if(isset($request->service_ids) && count($request->service_ids)>0){
+            //     foreach($request->service_ids as $service_id){
+            //         SalesPipelineService::create([
+            //             'user_id' =>  $user->id,
+            //             'customer_id' => $customer->id,
+            //             'sales_pipeline_id' => $pipeline->id,
+            //             'service_id' => $service_id,
+            //         ]);
+            //     }
+            // }
 
             FollowupLog::create([
                 'user_id' => $user->id,
@@ -182,54 +185,71 @@ class LeadController extends Controller
             ]);
  
             UserContact::create([
-                'user_id'           => $user->id,
-                'name'              => $request->name,
-                'relationship_or_role' => "Employee",
-                'office_phone'      => $request->office_phone,
-                'personal_phone'    => $request->personal_phone,
-                'office_email'      => $request->office_email,
-                'personal_email'    => $request->personal_email,
-                'whatsapp'          => $request->whatsapp,
-                'imo'               => $request->imo,
-                'facebook'          => $request->facebook,
-                'linkedin'          => $request->linkedin,
-            ]);
- 
-            UserAddress::create([
-                'user_id' => $user->id,
-                'address_type'      => "permanent",
-                'country'           => $request->permanent_country,
-                'division'          => $request->permanent_division,
-                'district'          => $request->permanent_district,
-                'upazila_or_thana'  => $request->permanent_upazila_or_thana,
-                "zip_code"          => $request->permanent_zip_code,
-                'address'           => $request->permanent_address, 
-                "is_same_present_permanent" => $request->is_same_present_permanent
+                'user_id'       => $user->id,
+                'name'          => $request->client_name,
+                'role'          => "Client Office",
+                'phone'         => $request->client_office_phone, 
+                'email'         => $request->office_email, 
+                'address'       => $request->client_office_email,  
+
+                'whatsapp'      => $request->whatsapp,
+                'imo'           => $request->imo,
+                'facebook'      => $request->facebook,
+                'linkedin'      => $request->linkedin,
             ]);
 
-            if(!$request->is_same_present_permanent){
-                UserAddress::create([
-                    'user_id' => $user->id,
-                    'address_type'      => "present",
-                    'country'           => $request->present_country,
-                    'division'          => $request->present_division,
-                    'district'          => $request->present_district,
-                    'upazila_or_thana'  => $request->present_upazila_or_thana,
-                    "zip_code"          => $request->present_zip_code,
-                    'address'           => $request->present_address, 
-                    "is_same_present_permanent" => $request->is_same_present_permanent
+            if($request->site_person!=null){
+                UserContact::create([
+                    'user_id'       => $user->id,
+                    'name'          => $request->site_person,
+                    'role'          => "Site",
+                    'phone'         => $request->site_phone,
+                    'email'         => $request->site_email, 
+                    'address'       => $request->site_address,
+    
+                    'whatsapp'      => $request->whatsapp,
+                    'imo'           => $request->imo,
+                    'facebook'      => $request->facebook,
+                    'linkedin'      => $request->linkedin,
                 ]);
-            } 
+            }
+            
+ 
+            // UserAddress::create([
+            //     'user_id' => $user->id,
+            //     'address_type'      => "permanent",
+            //     'country'           => $request->permanent_country,
+            //     'division'          => $request->permanent_division,
+            //     'district'          => $request->permanent_district,
+            //     'upazila_or_thana'  => $request->permanent_upazila_or_thana,
+            //     "zip_code"          => $request->permanent_zip_code,
+            //     'address'           => $request->permanent_address, 
+            //     "is_same_present_permanent" => $request->is_same_present_permanent
+            // ]);
+
+            // if(!$request->is_same_present_permanent){
+            //     UserAddress::create([
+            //         'user_id' => $user->id,
+            //         'address_type'      => "present",
+            //         'country'           => $request->present_country,
+            //         'division'          => $request->present_division,
+            //         'district'          => $request->present_district,
+            //         'upazila_or_thana'  => $request->present_upazila_or_thana,
+            //         "zip_code"          => $request->present_zip_code,
+            //         'address'           => $request->present_address, 
+            //         "is_same_present_permanent" => $request->is_same_present_permanent
+            //     ]);
+            // } 
             
 
-            if($authUser != $request->assigned_to){
-                Notification::create([
-                    'user_id' => $request->assigned_to,
-                    'title' => "New Lead Assigned!",
-                    'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
-                ]);
+            // if($authUser != $request->assigned_to){
+            //     Notification::create([
+            //         'user_id' => $request->assigned_to,
+            //         'title' => "New Lead Assigned!",
+            //         'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
+            //     ]);
                 
-            }
+            // }
             DB::commit();  
             return success_response(null,'Lead has been created');
 

@@ -11,7 +11,9 @@ class SalesPipeline extends Model
 
     protected $fillable = [
         'user_id',
-        'customer_id', 
+        'customer_id',
+        'service_id',
+        'qty',
         'followup_categorie_id',
         'purchase_probability',
         'price',
@@ -20,6 +22,7 @@ class SalesPipeline extends Model
         'assigned_to',
         'status',
     ];
+    
 
     public function user()
     {

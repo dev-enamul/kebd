@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained(); 
             $table->string('name');
-            $table->string('relationship_or_role');
-            $table->string('office_phone', 20)->nullable();
-            $table->string('personal_phone', 20)->nullable();
-            $table->string('office_email', 45)->nullable();
-            $table->string('personal_email', 45)->nullable();
+            $table->string('role');
+            $table->string('phone', 20)->nullable(); 
+            $table->string('email', 45)->nullable(); 
+            $table->text('address')->nullable(); 
+            
             $table->string('whatsapp', 20)->nullable();
             $table->string('imo', 20)->nullable();
             $table->string('facebook', 100)->nullable();

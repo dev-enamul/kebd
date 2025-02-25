@@ -16,7 +16,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $adminUser = User::create([
-            'name' => 'Admin User', 
+            'project_name' => 'Admin User', 
+            'client_name' => 'Admin User', 
             'email' => 'admin@example.com',
             'phone' => '1234567890',
             'user_type' => 'employee',
@@ -29,7 +30,8 @@ class UserSeeder extends Seeder
         ]);
  
         $johnDoeUser = User::create([
-            'name' => 'John Doe', 
+            'project_name' => 'John Doe', 
+            'client_name' => 'Admin User', 
             'email' => 'john@example.com',
             'phone' => '0987654321',
             'user_type' => 'employee',

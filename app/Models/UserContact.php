@@ -11,15 +11,15 @@ class UserContact extends Model
     protected $fillable = [
         'user_id',
         'name',
-        'relationship_or_role',
-        'office_phone',
-        'personal_phone',
-        'office_email',
-        'personal_email',
+        'role',
+        'phone',
+        'email',
+        'address',
         'whatsapp',
         'imo',
         'facebook',
         'linkedin',
     ];
+    
     
 }
