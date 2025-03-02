@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://canary-crm.vercel.app','http://localhost:7001'],
+    'allowed_origins' => ['https://kebd-crm.vercel.app','http://localhost:7002'],
 
     'allowed_origins_patterns' => [],
 
