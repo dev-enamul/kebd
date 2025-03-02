@@ -66,10 +66,10 @@ if (!function_exists('can')) {
         if ($user && $user->employee && $user->employee->designation) { 
             $permissions = $user->employee->designation->permissions ? $user->employee->designation->permissions->pluck('slug')->toArray() : [];
  
-            $is_admin = in_array('admin', $permissions);
+            $is_admin = in_array('admin', $permissions) || $user->employee->designation->slug == 'admin';
             if ($is_admin) {
                 return true;
-            } 
+            }             
             return in_array($permission, $permissions);
         }  
         return false;  

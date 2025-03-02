@@ -32,6 +32,7 @@ class LeadController extends Controller
             $authUser = User::find(Auth::user()->id);
  
             $query = $this->buildQuery($status, $category);
+        
             $datas = $this->filterByPermissions($query, $authUser); 
             $pagedData = $this->processAndPaginate($datas, $request);
 
@@ -45,14 +46,15 @@ class LeadController extends Controller
     { 
         $query = SalesPipeline::query()
             ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
-            ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
-            ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
+            // ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
+            // ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
+            ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
             ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
-                    'users.id as user_id', 'users.name as user_name', 'users.email as user_email', 'users.phone as user_phone', 
+                    'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name', 'users.email as user_email', 'users.phone as user_phone', 
                     'services.id as service_id', 'services.title as service_name')
             ->where('sales_pipelines.status', $status);
 
-        if ($category) {
+        if (isset($category) && $category != null) {
             $query->where('sales_pipelines.followup_categorie_id', $category);
         }
 
@@ -78,22 +80,25 @@ class LeadController extends Controller
     { 
         $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
             $salesPipeline = $salesPipelines->first();
-            $services = $salesPipelines->map(function ($pipeline) {
-                return [
-                    'id' => $pipeline->service_id,
-                    'name' => $pipeline->service_name,
-                ];
-            });
+            // $services = $salesPipelines->map(function ($pipeline) {
+            //     return [
+            //         'id' => $pipeline->service_id,
+            //         'name' => $pipeline->service_name,
+            //     ];
+            // });
 
             return [
                 'id' => $salesPipeline->lead_id,
                 'user_id' => $salesPipeline->user_id,
-                'name' => $salesPipeline->user_name,
+                'project_name' => $salesPipeline->project_name,
+                'client_name' => $salesPipeline->client_name,
                 'email' => $salesPipeline->user_email,
                 'phone' => $salesPipeline->user_phone,
                 'next_followup_date' => $salesPipeline->next_followup_date,
                 'last_contacted_at' => $salesPipeline->last_contacted_at,
-                'services' => $services,
+                'service_id' => $salesPipeline->service_id, 
+                'service' => $salesPipeline->service_name, 
+                // 'services' => $services,
             ];
         })->values(); 
         $sortedData = $groupedData->sortBy('next_followup_date'); 
