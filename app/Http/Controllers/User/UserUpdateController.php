@@ -42,14 +42,7 @@ class UserUpdateController extends Controller
     }
 
     public function bio_update(Request $request){
-        try{
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $request->user_id, 
-                'dob' => 'nullable|date'
-            ]);
-            
+        try{  
             
             $user_id = $request->user_id;
             $user = User::find($user_id);
@@ -59,12 +52,15 @@ class UserUpdateController extends Controller
             
             $user->update([
                 "name" => $request->name,
+                "project_name"  => $request->project_name,
+                "client_name"   => $request->client_name,
                 'email' => $request->email,
                 'phone' => $request->phone, 
                 "dob" => $request->dob, 
                 'blood_group' => $request->blood_group,
                 'gender' => $request->gender 
-            ]);
+            ]); 
+            
             return success_response(null,"Personal information updated");
         }catch(Exception $e){
             return error_response($e->getMessage(),500);
