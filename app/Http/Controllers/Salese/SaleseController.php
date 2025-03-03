@@ -70,45 +70,13 @@ class SaleseController extends Controller
                     $lead->status = "Salsed";
                     $lead->save();
                 }
-            }
-
-            $sales_by_user_id = Auth::user()->id;  
-            $salese = Salese::create([
-                'user_id' => $request->user_id,
-                'sales_pipeline_id' => $request->lead_id,  
-                'sales_by_user_id' => $sales_by_user_id,
-                'price' => $request->price,
-                'payment_schedule_amount' => $request->payment_schedule_amount
-            ]);
-         
-            $payment_schedule = $request->payment_schedule; 
-            $customer = Customer::where('user_id',$request->user_id)->first();
+            }   
+            $customer = Customer::where('user_id',$lead->customer_id)->first();
             if($customer){
-                $customer->total_sales = $customer->total_sales+1;
-                $customer->total_sales_amount = $customer->total_sales_amount+$request->price;
+                $customer->total_sales = $customer->total_sales+1; 
                 $customer->save();
-            } 
+            }   
             
-            $total_schedule_amount = 0;
-            if (isset($payment_schedule) && count($payment_schedule) > 0) { 
-
-                foreach ($payment_schedule as $schedule) {
-                    $total_schedule_amount += $schedule['amount'];
-                } 
-                if ($total_schedule_amount > $salese->price) {
-                    return error_response(null,404,"The total payment schedule amount cannot exceed the sale price.");
-                }
-
-                foreach ($payment_schedule as $schedule) {
-                    PaymentSchedule::create([
-                        'user_id' => $request->user_id,
-                        'salese_id' => $salese->id,  
-                        'date' => $schedule['date'],  
-                        'amount' => $schedule['amount'],
-                        'paid_amount' => 0,  
-                    ]);
-                }
-            }
             return success_response(null, "Salese created successfully");
         }catch(Exception $e){
             return error_response($e->getMessage());

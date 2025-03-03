@@ -68,14 +68,11 @@ class FollowupController extends Controller
             $pipeline = SalesPipeline::findOrFail($request->lead_id);
 
             $pipeline->update([
-                'followup_categorie_id' => $request->followup_categorie_id,
-                'purchase_probability' => $request->purchase_probability,
+                'followup_categorie_id' => $request->followup_categorie_id, 
                 'price' => $request->price,
                 'next_followup_date' => $request->next_followup_date,
                 'last_contacted_at' => now(),
-            ]);
-
-            $this->createSalesPipelineService($pipeline, $request->service_ids ?? []);
+            ]); 
 
             FollowupLog::create([
                 'user_id' => $pipeline->user_id,
@@ -93,40 +90,7 @@ class FollowupController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             return error_response($e->getMessage(), 500);
-        }
-
-    }
-
-    public function createSalesPipelineService($pipeline, $newServiceIds)
-    {
-        try {
-            $currentServiceIds = SalesPipelineService::where('sales_pipeline_id', $pipeline->id)
-                ->pluck('service_id')
-                ->toArray();
-    
-            $newServiceIds = $newServiceIds ?? [];
-            $serviceIdsToAdd = array_diff($newServiceIds, $currentServiceIds);
-            $serviceIdsToRemove = array_diff($currentServiceIds, $newServiceIds);
-    
-            // Delete services no longer needed
-            if (!empty($serviceIdsToRemove)) {
-                SalesPipelineService::where('sales_pipeline_id', $pipeline->id)
-                    ->whereIn('service_id', $serviceIdsToRemove)
-                    ->delete();
-            }
-    
-            // Add new services
-            foreach ($serviceIdsToAdd as $service_id) {
-                SalesPipelineService::create([
-                    'user_id' => $pipeline->user_id,
-                    'customer_id' => $pipeline->customer_id,
-                    'sales_pipeline_id' => $pipeline->id,
-                    'service_id' => $service_id,
-                ]);
-            }
-        } catch (Exception $e) {
-            throw new Exception("Failed to update services: " . $e->getMessage());
-        }
-    }
+        } 
+    } 
     
 }

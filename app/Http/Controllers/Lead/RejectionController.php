@@ -143,7 +143,7 @@ class RejectionController extends Controller
                 'last_contacted_at' => now(),
             ]);
 
-            $this->createSalesPipelineService($pipeline, $request->service_ids ?? []);
+            // $this->createSalesPipelineService($pipeline, $request->service_ids ?? []);
 
             FollowupLog::create([
                 'user_id' => $pipeline->user_id,

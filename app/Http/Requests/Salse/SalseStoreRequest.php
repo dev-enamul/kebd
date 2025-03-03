@@ -34,14 +34,8 @@ class SalseStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'user_id' => 'required|exists:users,id', 
-            'lead_id' => 'nullable|exists:sales_pipelines,id',
-            'price' => 'required|numeric',
-            'payment_schedule_amount' => 'required|numeric',
-            'payment_schedule' => 'nullable|array',
-            'payment_schedule.*.date' => 'required|date',
-            'payment_schedule.*.amount' => 'required|numeric',
+        return [ 
+            'lead_id' => 'nullable|exists:sales_pipelines,id', 
         ];
     }
 }
