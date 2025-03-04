@@ -288,6 +288,8 @@ class LeadController extends Controller
                 'user_id' => $user->id,
                 'services' => $services,
                 "name" => $user->name,
+                "project_name" => $user->project_name,
+                "client_name" => $user->client_name,
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'profile_image' => $user->profile_image,
