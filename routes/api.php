@@ -13,6 +13,7 @@ use App\Http\Controllers\Common\RoleApiController;
 use App\Http\Controllers\Common\UnionApiController;
 use App\Http\Controllers\Common\UpazilaApiController;
 use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Dashbaord\DashboardController;
 use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\LeadAssignController;
@@ -56,7 +57,8 @@ Route::get('upazilas',UpazilaApiController::class);
 Route::get('unions',UnionApiController::class); 
  
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::resource('designation', DesignationController::class);
+    // Route::get('dashboard-chard')
+    Route::get('designation-lead-chart', [DashboardController::class,'leadChart']);
     Route::resource('designation-permission',DesignationPermissionController::class);
     Route::resource('service', ServiceController::class);
 
