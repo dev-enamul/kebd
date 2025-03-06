@@ -27,4 +27,20 @@ class AuthController extends Controller
         $user = Auth::user();  
         return LoginService::createResponse($user);
     }  
+
+    public function updatePassword(Request $request)
+    { 
+        $request->validate([
+            'id'    => ['required'], 
+            'current_password' => ['required'],
+            'new_password' => ['required', 'min:8', 'confirmed'],
+        ]);  
+        $user = User::find($request->id);
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['error' => 'Current password is incorrect'], 422);
+        } 
+        $user->password = Hash::make($request->new_password);
+        $user->save(); 
+        return success_response(null,"Password updated successfully"); 
+    }
 }

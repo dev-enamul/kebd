@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeeUpdateController extends Controller
@@ -92,6 +93,22 @@ class EmployeeUpdateController extends Controller
         } catch (Exception $e) { 
             return error_response($e->getMessage(), 500);
         }
+    } 
+
+    public function updatePassword(Request $request)
+    { 
+        $request->validate([
+            'id'    => ['required'], 
+            'current_password' => ['required'],
+            'new_password' => ['required', 'min:8', 'confirmed'],
+        ]);  
+        $user = User::find($request->id);
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['error' => 'Current password is incorrect'], 422);
+        } 
+        $user->password = Hash::make($request->new_password);
+        $user->save(); 
+        return success_response(null,"Password updated successfully"); 
     }
     
 

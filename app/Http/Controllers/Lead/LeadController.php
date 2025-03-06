@@ -27,6 +27,7 @@ class LeadController extends Controller
             if (!can("lead")) {
                 return permission_error_response();
             } 
+
             $category = $request->category_id;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
@@ -49,9 +50,10 @@ class LeadController extends Controller
             // ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
             // ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
             ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
+            ->leftJoin('followup_categories', 'sales_pipelines.followup_categorie_id', '=', 'followup_categories.id')
             ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
                     'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name', 'users.email as user_email', 'users.phone as user_phone', 
-                    'services.id as service_id', 'services.title as service_name')
+                    'services.id as service_id', 'services.title as service_name','followup_categories.title as lead_category')
             ->where('sales_pipelines.status', $status);
 
         if (isset($category) && $category != null) {
@@ -98,6 +100,7 @@ class LeadController extends Controller
                 'last_contacted_at' => $salesPipeline->last_contacted_at,
                 'service_id' => $salesPipeline->service_id, 
                 'service' => $salesPipeline->service_name, 
+                'lead_category' => $salesPipeline->lead_category, 
                 // 'services' => $services,
             ];
         })->values(); 
