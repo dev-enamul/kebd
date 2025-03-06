@@ -15,9 +15,8 @@ class EducationController extends Controller
 {
     public function index(Request $request){
         try{
-            $user_id = $request->user_id;
-            $is_last = $request->is_last;
-            $education = UserEducation::where('user_id',$user_id)->where('is_last',$is_last)->get();
+            $user_id = $request->user_id; 
+            $education = UserEducation::where('user_id',$user_id)->get();
             return success_response($education);
         }catch(Exception $e){
             return error_response($e->getMessage());
