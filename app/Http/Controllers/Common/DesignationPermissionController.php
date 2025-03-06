@@ -8,6 +8,7 @@ use App\Models\DesignationPermission;
 use App\Models\Permission;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DesignationPermissionController extends Controller
 {
@@ -30,7 +31,12 @@ class DesignationPermissionController extends Controller
     }  
 
     public function update(Request $request, $designation_id) {
-        try { 
+        try {
+            $autdesignation = Auth::user()->employee->designation_id;
+            if ($autdesignation == $designation_id) {
+                return error_response(null, 400, "You are not allowed to update the permissions of your own designation.");
+            }
+            
             DesignationPermission::where('designation_id', $designation_id)->delete(); 
             $permissions = $request->permissions; 
             if (isset($permissions) && count($permissions) > 0) { 

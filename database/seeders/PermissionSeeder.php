@@ -37,12 +37,12 @@ class PermissionSeeder extends Seeder
             'create-rejection',
             'manage-rejection', 
 
-            'client',
-            'own-client',
-            'own-team-client',
-            'all-client', 
-            'create-client', 
-            'manage-client', 
+            // 'client',
+            // 'own-client',
+            // 'own-team-client',
+            // 'all-client', 
+            // 'create-client', 
+            // 'manage-client', 
 
             'sales',
             'own-sales',
@@ -51,24 +51,25 @@ class PermissionSeeder extends Seeder
             'create-sales', 
             'manage-sales', 
 
-            'payment-schedule',
-            'own-payment-schedule',
-            'own-team-payment-schedule',
-            'all-payment-schedule', 
-            'create-payment-schedule',
-            'manage-payment-schedule',
+            // 'payment-schedule',
+            // 'own-payment-schedule',
+            // 'own-team-payment-schedule',
+            // 'all-payment-schedule', 
+            // 'create-payment-schedule',
+            // 'manage-payment-schedule',
 
-            'payment-receive',
-            'own-payment-receive',
-            'own-team-payment-receive',
-            'all-payment-receive',
+            // 'payment-receive',
+            // 'own-payment-receive',
+            // 'own-team-payment-receive',
+            // 'all-payment-receive',
 
-            'account',
-            'own-account',
-            'own-team-account',
-            'all-account',
+            // 'account',
+            // 'own-account',
+            // 'own-team-account',
+            // 'all-account',
             'setting'
-        ]; 
+        ];  
+
         foreach ($permissions as $permission) {
             DB::table('permissions')->insert([
                 'name' => $permission, 
