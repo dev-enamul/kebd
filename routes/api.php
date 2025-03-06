@@ -58,6 +58,7 @@ Route::get('unions',UnionApiController::class);
  
 Route::middleware(['auth:sanctum'])->group(function () {
     // Route::get('dashboard-chard')
+    Route::resource('designation',DesignationController::class);
     Route::get('designation-lead-chart', [DashboardController::class,'leadChart']);
     Route::resource('designation-permission',DesignationPermissionController::class);
     Route::resource('service', ServiceController::class);
