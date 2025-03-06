@@ -24,6 +24,7 @@ class FollowupController extends Controller
             $lead_id = $request->lead_id;
             $customer_id = $request->customer_id;
             $user_id = $request->user_id; 
+            $pipeline = SalesPipeline::find($lead_id);
             $query = FollowupLog::query();
 
             if ($lead_id) {
@@ -47,12 +48,13 @@ class FollowupController extends Controller
                                 'followup_category' => $followup->followupCategory->title ?? "", 
                                 'next_followup_date' => $followup->next_followup_date,
                                 'date' => $followup->created_at,
-                                'followup_by' => $followup->user->name??"-",
+                                'followup_by' => $followup->followupBy->name??"-",
                                 'lead_category' => $followup->followupCategory->title??"-",
                                 'notes' => $followup->notes, 
                             ];
                         });
 
+          
             return success_response($datas, 200);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);

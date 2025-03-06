@@ -26,6 +26,10 @@ class FollowupLog extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function followupBy(){
+        return $this->belongsTo(User::class,'created_by');
+    }
+
     public function followupCategory()
     {
         return $this->belongsTo(FollowupCategory::class, 'followup_categorie_id');
