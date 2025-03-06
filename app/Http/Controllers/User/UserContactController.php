@@ -22,18 +22,7 @@ class UserContactController extends Controller
  
      public function add_contact(Request $request)
      {
-         $request->validate([
-             'user_id' => 'required',
-             'name' => 'nullable|string|max:255', 
-             'role' => 'nullable|string|max:20',
-             'phone' => 'nullable|string|max:20',
-             'email' => 'nullable|email|max:45',
-             'address' => 'nullable|email|max:45', 
-             'whatsapp' => 'nullable|string|max:20',
-             'imo' => 'nullable|string|max:20',
-             'facebook' => 'nullable|string|max:100',
-             'linkedin' => 'nullable|string|max:100',
-         ]); 
+          
          try {
              UserContact::create([
                 'user_id' => $request->user_id,
