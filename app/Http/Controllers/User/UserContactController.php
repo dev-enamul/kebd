@@ -43,19 +43,7 @@ class UserContactController extends Controller
      }
  
      public function update_contact(Request $request, $id)
-     { 
-         $request->validate([ 
-             'name' => 'nullable|string|max:255', 
-             'role' => 'nullable|string|max:20',
-             'phone' => 'nullable|string|max:20',
-             'email' => 'nullable|email|max:45',
-             'address' => 'nullable|email|max:45', 
-             'whatsapp' => 'nullable|string|max:20',
-             'imo' => 'nullable|string|max:20',
-             'facebook' => 'nullable|string|max:100',
-             'linkedin' => 'nullable|string|max:100',
-         ]);   
-
+     {  
          try { 
             $userContact = UserContact::find($id);
             if(!$userContact){
