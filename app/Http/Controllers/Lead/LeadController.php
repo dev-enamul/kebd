@@ -81,14 +81,7 @@ class LeadController extends Controller
     private function processAndPaginate($datas, $request)
     { 
         $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
-            $salesPipeline = $salesPipelines->first();
-            // $services = $salesPipelines->map(function ($pipeline) {
-            //     return [
-            //         'id' => $pipeline->service_id,
-            //         'name' => $pipeline->service_name,
-            //     ];
-            // });
-
+            $salesPipeline = $salesPipelines->first(); 
             return [
                 'id' => $salesPipeline->lead_id,
                 'user_id' => $salesPipeline->user_id,
@@ -101,14 +94,15 @@ class LeadController extends Controller
                 'service_id' => $salesPipeline->service_id, 
                 'service' => $salesPipeline->service_name, 
                 'lead_category' => $salesPipeline->lead_category, 
-                // 'services' => $services,
             ];
         })->values(); 
-        $sortedData = $groupedData->sortBy('next_followup_date'); 
+
+        $sortedData = $groupedData->sortBy('next_followup_date')->values(); // ✅ Ensure sorted result is also indexed
+
         $perPage = $request->get('per_page', 20);
         $currentPage = $request->get('page', 1); 
-        $pagedData = $sortedData->forPage($currentPage, $perPage);
-    
+        $pagedData = $sortedData->forPage($currentPage, $perPage)->values(); // ✅ Ensure paginated data remains indexed
+
         $totalItems = $sortedData->count();  
         $pagination = [
             'current_page' => $currentPage, 
@@ -117,13 +111,10 @@ class LeadController extends Controller
         ];
 
         return [
-            'data' => $pagedData,
+            'data' => $pagedData,  // ✅ Now this will always be an array
             'meta' => $pagination,
         ];
-    }
-
-
-    
+    } 
     
 
     
