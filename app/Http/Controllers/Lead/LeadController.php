@@ -173,14 +173,17 @@ class LeadController extends Controller
             //             'service_id' => $service_id,
             //         ]);
             //     }
-            // }
+            // }  
 
+            $leadCategory = FollowupCategory::where('status',1)->first();
             FollowupLog::create([
                 'user_id' => $user->id,
+                'followup_categorie_id' => $leadCategory->id,
                 'customer_id' => $customer->id,
                 'pipeline_id' => $pipeline->id,
                 'followup_category_id' => $followup_category->id,
                 'notes' => $request->notes,
+                'created_by' => Auth::user()->id
             ]);
  
             UserContact::create([

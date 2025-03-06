@@ -46,15 +46,13 @@ class FollowupController extends Controller
                             return [
                                 'id' => $followup->id,
                                 'followup_category' => $followup->followupCategory->title ?? "", 
-                                'next_followup_date' => $followup->next_followup_date,
+                                'next_followup_date' => $followup->created_at,
                                 'date' => $followup->created_at,
-                                'followup_by' => $followup->followupBy->name??"-",
-                                'lead_category' => $followup->followupCategory->title??"-",
+                                'followup_by' => $followup->followupBy->name??"-", 
                                 'notes' => $followup->notes, 
                             ];
                         });
 
-          
             return success_response($datas, 200);
         } catch (Exception $e) {
             return error_response($e->getMessage(), 500);
