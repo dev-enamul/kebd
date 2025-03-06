@@ -46,6 +46,9 @@ class FollowupController extends Controller
                                 'id' => $followup->id,
                                 'followup_category' => $followup->followupCategory->title ?? "", 
                                 'next_followup_date' => $followup->next_followup_date,
+                                'date' => $followup->created_at,
+                                'followup_by' => $followup->user->name??"-",
+                                'lead_category' => $followup->followupCategory->title??"-",
                                 'notes' => $followup->notes, 
                             ];
                         });
