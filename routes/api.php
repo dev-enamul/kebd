@@ -79,7 +79,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('address/{user_id}',[UserAddressController::class,'show']); 
     // contact   
     Route::get('contact-data/{user_id}',[UserContactController::class,'contact_data']);
-    Route::put('upate-contact/{id}',[UserContactController::class,'update_contact']);
+    Route::put('update-contact/{id}',[UserContactController::class,'update_contact']);
     Route::post('add-contact',[UserContactController::class,'add_contact']); 
     // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
