@@ -28,7 +28,7 @@ class LeadController extends Controller
                 return permission_error_response();
             } 
 
-            $category = $request->category_id ;
+            $category = $request->category_id??null;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
  
