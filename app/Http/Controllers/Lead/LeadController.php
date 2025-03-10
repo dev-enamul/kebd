@@ -13,6 +13,7 @@ use App\Models\SalesPipelineService;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserContact;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,43 +79,44 @@ class LeadController extends Controller
         }
     }
 
-    private function processAndPaginate($datas, $request)
-    { 
-        $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
-            $salesPipeline = $salesPipelines->first(); 
-            return [
-                'id' => $salesPipeline->lead_id,
-                'user_id' => $salesPipeline->user_id,
-                'project_name' => $salesPipeline->project_name,
-                'client_name' => $salesPipeline->client_name,
-                'email' => $salesPipeline->user_email,
-                'phone' => $salesPipeline->user_phone,
-                'next_followup_date' => $salesPipeline->next_followup_date,
-                'last_contacted_at' => $salesPipeline->last_contacted_at,
-                'service_id' => $salesPipeline->service_id, 
-                'service' => $salesPipeline->service_name, 
-                'lead_category' => $salesPipeline->lead_category, 
-            ];
-        })->values(); 
-
-        $sortedData = $groupedData->sortBy('next_followup_date')->values(); // ✅ Ensure sorted result is also indexed
-
-        $perPage = $request->get('per_page', 20);
-        $currentPage = $request->get('page', 1); 
-        $pagedData = $sortedData->forPage($currentPage, $perPage)->values(); // ✅ Ensure paginated data remains indexed
-
-        $totalItems = $sortedData->count();  
-        $pagination = [
-            'current_page' => $currentPage, 
-            'total_items' => $totalItems,
-            'per_page' => $perPage,
-        ];
-
-        return [
-            'data' => $pagedData,  // ✅ Now this will always be an array
-            'meta' => $pagination,
-        ];
-    } 
+    public function leadReport(Request $request)
+    {
+        try { 
+            $perPage = $request->get('per_page', 20);   
+            $currentPage = $request->get('page', 1);   
+            $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
+            $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
+            $employee_id = $request->user_id ?? Auth::user()->id; 
+     
+            $logs = FollowupLog::where('created_by', $employee_id)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->paginate($perPage, ['*'], 'page', $currentPage);
+     
+            $formattedLogs = $logs->map(function ($log) {
+                return [
+                    "project_name"      => optional($log->user)->project_name ?? "-",
+                    "followup_category" => optional($log->followupCategory)->title ?? "-",
+                    "date"              => $log->created_at ?? "-",
+                    "notes"             => $log->notes ?? "-",
+                ];
+            });
+     
+            return success_response([
+                'data' => $formattedLogs,
+                'pagination' => [
+                    'total' => $logs->total(),
+                    'per_page' => $logs->perPage(),
+                    'current_page' => $logs->currentPage(),
+                    'last_page' => $logs->lastPage(),
+                    'next_page_url' => $logs->nextPageUrl(),
+                    'prev_page_url' => $logs->previousPageUrl(),
+                ]
+            ]);
+        } catch (Exception $e) {
+            return error_response($e->getMessage());
+        }
+    }
+    
     
 
     
