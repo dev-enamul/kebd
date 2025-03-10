@@ -55,7 +55,7 @@ class CustomerLeadHistoryController extends Controller
             $logs = $logs->map(function ($log) {
                 return [
                     "project_name"      => optional($log->user)->project_name ?? "-",
-                    "followup_category" => optional($log->followup_category)->title ?? "-",
+                    "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",
                     "notes"             => $log->notes ?? "-",
                 ];
