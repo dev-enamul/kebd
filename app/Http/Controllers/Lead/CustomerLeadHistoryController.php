@@ -13,21 +13,22 @@ class CustomerLeadHistoryController extends Controller
     public function __invoke($user_id)
     {
         try {
-            $lead_history = SalesPipeline::where('user_id', $user_id)->get();
-
+            $lead_history = SalesPipeline::where('user_id', $user_id)
+                ->with(['services', 'assignTo', 'followupCategory'])  
+                ->get(); 
             $lead_history = $lead_history->map(function ($lead) {
                 return [
                     'status' => $lead->status,   
-                    'service' => $lead->services->title??"-",
-                    'employee' => $lead->assignTo->name??"-",
-                    'followup_category' => $lead->followupCategory->title??"-",
+                    'service' => optional($lead->services()->first())->title ?? "-",
+                    'employee' => optional($lead->assignTo()->first())->name ?? "-",
+                    'followup_category' => optional($lead->followupCategory()->first())->title ?? "-",
                 ];
-            });
-
+            }); 
             return success_response($lead_history);
         } catch (Exception $e) {
             return error_response($e->getMessage());
         }
+        
     }
 
      
