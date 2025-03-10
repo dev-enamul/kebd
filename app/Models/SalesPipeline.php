@@ -30,6 +30,11 @@ class SalesPipeline extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
+    public function assignTo()
+    {
+        return $this->belongsTo(User::class,'assigned_to');
+    }
+
     public function follwoup()
     {
         return $this->belongsTo(FollowupLog::class,'pipeline_id');
@@ -44,4 +49,6 @@ class SalesPipeline extends Model
     {
         return $this->belongsTo(FollowupCategory::class, 'followup_categorie_id');
     }
+
+
 }
