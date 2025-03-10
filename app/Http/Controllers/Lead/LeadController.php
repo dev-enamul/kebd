@@ -79,20 +79,18 @@ class LeadController extends Controller
         }
     }
 
-    public function leadReport(Request $request)
-    {
-        try { 
-            $perPage = $request->get('per_page', 20);   
-            $currentPage = $request->get('page', 1);   
+    public function leadReport(Request $request){
+        try {
             $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::user()->id; 
-     
+    
+            // Paginate the results
             $logs = FollowupLog::where('created_by', $employee_id)
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->paginate($perPage, ['*'], 'page', $currentPage);
-     
-            $formattedLogs = $logs->map(function ($log) {
+                ->paginate(10);  // Adjust the number 10 to whatever is the desired number of results per page
+    
+            $logs = $logs->map(function ($log) {
                 return [
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
@@ -100,22 +98,20 @@ class LeadController extends Controller
                     "notes"             => $log->notes ?? "-",
                 ];
             });
-     
+    
+            // Return the paginated data along with the total count
             return success_response([
-                'data' => $formattedLogs,
-                'pagination' => [
-                    'total' => $logs->total(),
-                    'per_page' => $logs->perPage(),
-                    'current_page' => $logs->currentPage(),
-                    'last_page' => $logs->lastPage(),
-                    'next_page_url' => $logs->nextPageUrl(),
-                    'prev_page_url' => $logs->previousPageUrl(),
-                ]
+                'total' => $logs->total(),  // Total number of records in the database
+                'current_page' => $logs->currentPage(),  // Current page number
+                'per_page' => $logs->perPage(),  // Number of results per page
+                'last_page' => $logs->lastPage(),  // Last page number
+                'data' => $logs
             ]);
         } catch (Exception $e) {
             return error_response($e->getMessage());
         }
     }
+    
     
     
 
