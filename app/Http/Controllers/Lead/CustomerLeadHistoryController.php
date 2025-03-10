@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Lead;
 
 use App\Http\Controllers\Controller;
+use App\Models\FollowupLog;
 use App\Models\SalesPipeline;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerLeadHistoryController extends Controller
 {
@@ -21,8 +24,9 @@ class CustomerLeadHistoryController extends Controller
                     "id" =>$lead->assignTo->id??"-",
                     "name" =>$lead->assignTo->name??"-",
                     "email" =>$lead->assignTo->email??"-",
-                    "profile_image" =>$lead->assignTo->profile_image??"-",
+                    "profile_image" =>$lead->assignTo->profile_image,
                 ];
+
                 return [
                     'id' => $lead->id, 
                     'status' => $lead->status,
@@ -36,6 +40,31 @@ class CustomerLeadHistoryController extends Controller
             return error_response($e->getMessage());
         }
         
+    } 
+
+    public function leadReport(Request $request){
+        try {
+            $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
+            $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
+            $employee_id = $request->user_id ?? Auth::user()->id; 
+    
+            $logs = FollowupLog::where('created_by', $employee_id)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+     
+            $logs = $logs->map(function ($log) {
+                return [
+                    "project_name"      => optional($log->user)->project_name ?? "-",
+                    "followup_category" => optional($log->followup_category)->title ?? "-",
+                    "date"              => $log->created_at ?? "-",
+                    "notes"             => $log->notes ?? "-",
+                ];
+            });
+    
+            return success_response($logs);
+        } catch (Exception $e) {
+            return error_response($e->getMessage());
+        } 
     }
 
      
