@@ -17,11 +17,17 @@ class CustomerLeadHistoryController extends Controller
                 ->with(['service', 'assignTo', 'followupCategory'])  
                 ->get(); 
             $lead_history = $lead_history->map(function ($lead) {
+                $employee = [
+                    "id" =>$lead->assignTo->id??"-",
+                    "name" =>$lead->assignTo->name??"-",
+                    "email" =>$lead->assignTo->email??"-",
+                    "profile_image" =>$lead->assignTo->profile_image??"-",
+                ];
                 return [
                     'id' => $lead->id, 
                     'status' => $lead->status,
                     'service' => @$lead->service->title ?? "-",
-                    'employee' => @$lead->assignTo ?? "-",
+                    'employee' => $employee,
                     'followup_category' => @$lead->followupCategory->title ?? "-",
                 ];
             }); 
