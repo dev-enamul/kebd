@@ -18,9 +18,9 @@ class CustomerLeadHistoryController extends Controller
             $lead_history = $lead_history->map(function ($lead) {
                 return [
                     'status' => $lead->status,   
-                    'service' => optional($lead->services)->title,
-                    'employee' => optional($lead->assignTo)->name,
-                    'followup_category' => optional($lead->followupCategory)->title,
+                    'service' => $lead->services->title??"-",
+                    'employee' => $lead->assignTo->name??"-",
+                    'followup_category' => $lead->followupCategory->title??"-",
                 ];
             });
 
