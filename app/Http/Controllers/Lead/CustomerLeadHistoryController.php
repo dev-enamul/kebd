@@ -63,8 +63,7 @@ class CustomerLeadHistoryController extends Controller
                     "date"              => $log->created_at ?? "-",
                     "notes"             => $log->notes ?? "-",
                 ];
-            });
-    
+            }); 
             return success_response([
                 'data' => $logs,
                 'pagination' => [
