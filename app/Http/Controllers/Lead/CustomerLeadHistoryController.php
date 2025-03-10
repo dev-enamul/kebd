@@ -18,7 +18,8 @@ class CustomerLeadHistoryController extends Controller
                 ->get(); 
             $lead_history = $lead_history->map(function ($lead) {
                 return [
-                    'status' => $lead->status,   
+                    'id' => $lead->id, 
+                    'status' => $lead->status,
                     'service' => optional($lead->services()->first())->title ?? "-",
                     'employee' => optional($lead->assignTo()->first())->name ?? "-",
                     'followup_category' => optional($lead->followupCategory()->first())->title ?? "-",

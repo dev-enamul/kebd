@@ -162,7 +162,7 @@ class LeadController extends Controller
                 'service_details' => $request->service_details,
                 'qty'           => $request->qty,
                 'followup_categorie_id' => $followup_category->id,
-                'assigned_to'   => $request->assigned_to,
+                'assigned_to'   => $authUser->id,
             ]);
 
             // if(isset($request->service_ids) && count($request->service_ids)>0){
