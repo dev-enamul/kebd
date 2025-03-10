@@ -65,7 +65,17 @@ class CustomerLeadHistoryController extends Controller
                 ];
             });
     
-            return success_response($logs);
+            return success_response([
+                'data' => $logs,
+                'pagination' => [
+                    'total' => $logs->total(),
+                    'per_page' => $logs->perPage(),
+                    'current_page' => $logs->currentPage(),
+                    'last_page' => $logs->lastPage(),
+                    'next_page_url' => $logs->nextPageUrl(),
+                    'prev_page_url' => $logs->previousPageUrl(),
+                ]
+            ]);
         } catch (Exception $e) {
             return error_response($e->getMessage());
         }
