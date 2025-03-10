@@ -14,7 +14,7 @@ class CustomerLeadHistoryController extends Controller
     {
         try {
             $lead_history = SalesPipeline::where('user_id', $user_id)
-                ->with(['services', 'assignTo', 'followupCategory'])  
+                ->with(['service', 'assignTo', 'followupCategory'])  
                 ->get(); 
             $lead_history = $lead_history->map(function ($lead) {
                 return [
