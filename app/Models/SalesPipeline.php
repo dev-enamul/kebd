@@ -42,7 +42,7 @@ class SalesPipeline extends Model
  
     public function services()
     {
-        return $this->belongsToMany(Service::class, 'sales_pipeline_services', 'sales_pipeline_id', 'service_id');
+        return $this->belongsTo(Service::class,'service_id');
     }
  
     public function followupCategory()
