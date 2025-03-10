@@ -16,6 +16,7 @@ use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Dashbaord\DashboardController;
 use App\Http\Controllers\FileControllr;
 use App\Http\Controllers\Followup\FollowupController;
+use App\Http\Controllers\Lead\CustomerLeadHistoryController;
 use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
 use App\Http\Controllers\Lead\RejectionController;
@@ -92,9 +93,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::resource('lead-rejection',RejectionController::class);
     Route::post('rejection-to-lead',[RejectionController::class,'rejectToLead']);
-
-    // Customer 
-    Route::get('clients',[CustomerController::class,'index']); 
+ 
 
     // Salese 
     Route::resource('sales',SaleseController::class);
@@ -109,6 +108,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Notification 
     Route::resource('notification',NotificationController::class);
     Route::get('read-notification/{id}',[NotificationController::class,'read']);
+
+    Route::get('customer-lead-history/{user_id}',[CustomerLeadHistoryController::class]);
 });
 
 

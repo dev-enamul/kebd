@@ -13,6 +13,7 @@ class SalesPipeline extends Model
         'user_id',
         'customer_id',
         'service_id',
+        "service_details",
         'qty',
         'followup_categorie_id',
         'purchase_probability',

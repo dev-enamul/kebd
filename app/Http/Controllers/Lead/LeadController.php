@@ -119,7 +119,7 @@ class LeadController extends Controller
 
     
     public function store(CustomerStoreRequest $request)
-    { 
+    {
         if (!can("create-lead")) {
             return permission_error_response();
         } 
@@ -130,7 +130,7 @@ class LeadController extends Controller
             $profilePicPath = null;
             if ($request->hasFile('profile_image')) {
                 $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
-            }  
+            }
             
             $user = User::create([
                 'project_name'          => $request->project_name,
@@ -159,6 +159,7 @@ class LeadController extends Controller
                 'user_id'       => $user->id,
                 'customer_id'   => $customer->id,
                 'service_id'    => $request->service_id,
+                'service_details' => $request->service_details,
                 'qty'           => $request->qty,
                 'followup_categorie_id' => $followup_category->id,
                 'assigned_to'   => $request->assigned_to,
@@ -244,14 +245,13 @@ class LeadController extends Controller
             // } 
             
 
-            // if($authUser != $request->assigned_to){
-            //     Notification::create([
-            //         'user_id' => $request->assigned_to,
-            //         'title' => "New Lead Assigned!",
-            //         'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
-            //     ]);
-                
-            // }
+            if($authUser != $request->assigned_to){
+                Notification::create([
+                    'user_id' => $request->assigned_to,
+                    'title' => "New Lead Assigned!",
+                    'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
+                ]);  
+            }
             DB::commit();  
             return success_response(null,'Lead has been created');
 

@@ -26,7 +26,6 @@ class DesignationPermissionController extends Controller
                 })
             ];
         }
-    
         return $permission; 
     }  
 

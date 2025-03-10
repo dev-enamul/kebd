@@ -21,8 +21,7 @@ class FollowupCategoryController extends Controller
                 $categories = FollowupCategory::select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
             }else{
                 $categories = FollowupCategory::where('status', $status)->select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
-            }
-            
+            } 
             return success_response($categories);
         } catch (Exception $e) {
             return error_response($e->getMessage(), $e->getCode());
