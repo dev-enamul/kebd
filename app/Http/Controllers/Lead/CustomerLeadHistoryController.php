@@ -42,15 +42,19 @@ class CustomerLeadHistoryController extends Controller
         
     } 
 
-    public function leadReport(Request $request){
-        try {
+    public function leadReport(Request $request)
+    {
+        try { 
+            $perPage = $request->get('per_page', 20);   
+            $currentPage = $request->get('page', 1);   
+    
             $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::user()->id; 
-    
+     
             $logs = FollowupLog::where('created_by', $employee_id)
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->get();
+                ->paginate($perPage, ['*'], 'page', $currentPage);  
      
             $logs = $logs->map(function ($log) {
                 return [
@@ -64,8 +68,9 @@ class CustomerLeadHistoryController extends Controller
             return success_response($logs);
         } catch (Exception $e) {
             return error_response($e->getMessage());
-        } 
+        }
     }
+    
 
      
 }
