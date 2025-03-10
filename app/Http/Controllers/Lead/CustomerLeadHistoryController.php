@@ -21,8 +21,8 @@ class CustomerLeadHistoryController extends Controller
                     'id' => $lead->id, 
                     'status' => $lead->status,
                     'service' => @$lead->service->title ?? "-",
-                    'employee' => @$lead->assignTo() ?? "-",
-                    'followup_category' => optional($lead->followupCategory()->first())->title ?? "-",
+                    'employee' => @$lead->assignTo ?? "-",
+                    'followup_category' => @$lead->followupCategory->title ?? "-",
                 ];
             }); 
             return success_response($lead_history);
