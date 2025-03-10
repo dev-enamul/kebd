@@ -40,7 +40,7 @@ class SalesPipeline extends Model
         return $this->belongsTo(FollowupLog::class,'pipeline_id');
     }
  
-    public function services()
+    public function service()
     {
         return $this->belongsTo(Service::class,'service_id');
     }
