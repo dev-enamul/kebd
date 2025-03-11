@@ -84,11 +84,10 @@ class LeadController extends Controller
             $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::user()->id; 
-    
-            // Paginate the results
+     
             $logs = FollowupLog::where('created_by', $employee_id)
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->paginate(10);  // Adjust the number 10 to whatever is the desired number of results per page
+                ->paginate(10);  
     
             $logs = $logs->map(function ($log) {
                 return [
@@ -101,10 +100,9 @@ class LeadController extends Controller
     
             // Return the paginated data along with the total count
             return success_response([
-                'total' => $logs->total(),  // Total number of records in the database
-                'current_page' => $logs->currentPage(),  // Current page number
-                'per_page' => $logs->perPage(),  // Number of results per page
-                'last_page' => $logs->lastPage(),  // Last page number
+                'total' => $logs->total(),   
+                'current_page' => $logs->currentPage(),   
+                'per_page' => $logs->perPage(),  
                 'data' => $logs
             ]);
         } catch (Exception $e) {

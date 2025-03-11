@@ -52,27 +52,26 @@ class CustomerLeadHistoryController extends Controller
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::user()->id; 
      
-            $logs = FollowupLog::where('created_by', $employee_id)
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->paginate($perPage, ['*'], 'page', $currentPage);  
+            $datas = FollowupLog::where('created_by', $employee_id)
+                ->whereBetween('created_at', [$startDate, $endDate]);
+                 
+            $logs = $datas->paginate($perPage, ['*'], 'page', $currentPage);
+            $total = $datas->count();
      
-            $logs = $logs->map(function ($log) {
+            $logs->map(function ($log) {
                 return [
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",
                     "notes"             => $log->notes ?? "-",
                 ];
-            }); 
+            });  
             return success_response([
                 'data' => $logs,
-                'pagination' => [
-                    'total' => $logs->total(),
-                    'per_page' => $logs->perPage(),
-                    'current_page' => $logs->currentPage(),
-                    'last_page' => $logs->lastPage(),
-                    'next_page_url' => $logs->nextPageUrl(),
-                    'prev_page_url' => $logs->previousPageUrl(),
+                'meta' => [
+                    'total' => $total,
+                    'per_page' => $perPage,
+                    'current_page' => $currentPage
                 ]
             ]);
         } catch (Exception $e) {
