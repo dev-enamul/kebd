@@ -110,7 +110,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('read-notification/{id}',[NotificationController::class,'read']);  
     
     Route::get('customer-lead-history/{user_id}', CustomerLeadHistoryController::class);
-    Route::get('lead-report',[CustomerLeadHistoryController::class,'leadReport']); 
+    Route::get('lead-report',[CustomerLeadHistoryController::class,'leadReport']);
+    Route::get('dashbaord-report',[DashboardController::class,'cardData']);
 });
 
 
