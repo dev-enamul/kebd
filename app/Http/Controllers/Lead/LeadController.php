@@ -77,7 +77,49 @@ class LeadController extends Controller
         } else {
             return collect();
         }
+    } 
+
+
+    private function processAndPaginate($datas, $request)
+    { 
+        $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
+            $salesPipeline = $salesPipelines->first();
+            $services = $salesPipelines->map(function ($pipeline) {
+                return [
+                    'id' => $pipeline->service_id,
+                    'name' => $pipeline->service_name,
+                ];
+            });
+
+            return [
+                'id' => $salesPipeline->lead_id,
+                'user_id' => $salesPipeline->user_id,
+                'name' => $salesPipeline->user_name,
+                'email' => $salesPipeline->user_email,
+                'phone' => $salesPipeline->user_phone,
+                'next_followup_date' => $salesPipeline->next_followup_date,
+                'last_contacted_at' => $salesPipeline->last_contacted_at,
+                'services' => $services,
+            ];
+        })->values(); 
+        $sortedData = $groupedData->sortBy('next_followup_date'); 
+        $perPage = $request->get('per_page', 20);
+        $currentPage = $request->get('page', 1); 
+        $pagedData = $sortedData->forPage($currentPage, $perPage);
+    
+        $totalItems = $sortedData->count();  
+        $pagination = [
+            'current_page' => $currentPage, 
+            'total_items' => $totalItems,
+            'per_page' => $perPage,
+        ];
+
+        return [
+            'data' => $pagedData,
+            'meta' => $pagination,
+        ];
     }
+
 
     public function leadReport(Request $request){
         try {
@@ -94,6 +136,7 @@ class LeadController extends Controller
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",
+                    "last_followup_date" => $log->updated_at ?? $log->created_at,
                     "notes"             => $log->notes ?? "-",
                 ];
             });

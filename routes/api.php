@@ -86,7 +86,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
 
-    
+
     Route::resource('lead', LeadController::class);
     Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
    
@@ -113,7 +113,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::get('customer-lead-history/{user_id}', CustomerLeadHistoryController::class);
     Route::get('lead-report',[CustomerLeadHistoryController::class,'leadReport']);
-    Route::get('dashbaord-report',[DashboardController::class,'cardData']);
+    Route::get('dashbaord-card',[DashboardController::class,'cardData']);
 });
 
 
