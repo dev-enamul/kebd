@@ -19,19 +19,12 @@ class CustomerLeadHistoryController extends Controller
             $lead_history = SalesPipeline::where('user_id', $user_id)
                 ->with(['service', 'assignTo', 'followupCategory'])  
                 ->get(); 
-            $lead_history = $lead_history->map(function ($lead) {
-                $employee = [
-                    "id" =>$lead->assignTo->id??"-",
-                    "name" =>$lead->assignTo->name??"-",
-                    "email" =>$lead->assignTo->email??"-",
-                    "profile_image" =>$lead->assignTo->profile_image,
-                ];
-
-                return [
-                    'id' => $lead->id, 
+            $lead_history = $lead_history->map(function ($lead) {  
+                
+                return [ 
+                    'employee_name' => $lead->assignTo->name??"-",
                     'status' => $lead->status,
-                    'service' => @$lead->service->title ?? "-",
-                    'employee' => $employee,
+                    'service' => @$lead->service->title ?? "-", 
                     'followup_category' => @$lead->followupCategory->title ?? "-",
                 ];
             }); 
@@ -62,6 +55,7 @@ class CustomerLeadHistoryController extends Controller
             // Apply transformation correctly
             $logs = $logs->map(function ($log) {
                 return [
+                    'employee_name'     => @$log->followupBy->name??"-",
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",

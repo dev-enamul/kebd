@@ -17,7 +17,12 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained()->onDelete('cascade');
             $table->foreignId('designation_id')->constrained()->onDelete('cascade');
             $table->timestamp('start_date')->nullable();
-            $table->timestamp('end_date')->nullable();
+            $table->timestamp('end_date')->nullable(); 
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            
             $table->softDeletes();
             $table->timestamps();
         });
