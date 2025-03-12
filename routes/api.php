@@ -47,8 +47,7 @@ use Illuminate\Support\Facades\Route;
 */  
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
-Route::get('roles',RoleApiController::class);
-
+Route::get('roles',RoleApiController::class); 
 
 // Location 
 Route::get('countries',CountryApiController::class);

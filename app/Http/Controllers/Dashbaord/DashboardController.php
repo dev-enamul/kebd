@@ -32,7 +32,7 @@ class DashboardController extends Controller
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::user()->id;
 
-            $data  = SalesPipeline::where('last_contacted_at',$employee_id)->whereBetween('created_at', [$startDate, $endDate]);
+            $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate]);
             $return_data = [
                 'lead_collect' => $data->count(),
                 'lead_active' => $data->where('status','Active')->count(),
