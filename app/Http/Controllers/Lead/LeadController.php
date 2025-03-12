@@ -241,13 +241,13 @@ class LeadController extends Controller
             // } 
             
 
-            if($authUser != $request->assigned_to){
-                Notification::create([
-                    'user_id' => $request->assigned_to,
-                    'title' => "New Lead Assigned!",
-                    'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
-                ]);  
-            }
+            // if($authUser != $request->assigned_to){
+            //     Notification::create([
+            //         'user_id' => $request->assigned_to,
+            //         'title' => "New Lead Assigned!",
+            //         'data' => "A new lead has been assigned to you. Take action now and convert it into a successful deal!",
+            //     ]);  
+            // }
             DB::commit();  
             return success_response(null,'Lead has been created');
 
