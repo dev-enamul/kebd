@@ -85,6 +85,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('add-contact',[UserContactController::class,'add_contact']); 
     // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
+
+    
     Route::resource('lead', LeadController::class);
     Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
    
