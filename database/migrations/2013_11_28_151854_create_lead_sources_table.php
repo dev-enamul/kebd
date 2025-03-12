@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
 
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             
             $table->softDeletes();
             $table->timestamps();

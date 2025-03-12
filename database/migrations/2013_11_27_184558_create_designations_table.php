@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('slug')->unique(); // Ensuring unique slugs
             $table->boolean('status')->default(1)->comment("0=Inactive, 1=Active"); // Changed to boolean
             
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            // $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             
             $table->softDeletes();
             $table->timestamps();
