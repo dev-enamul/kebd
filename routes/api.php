@@ -68,7 +68,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('update-employee-designation',[EmployeeUpdateController::class,'updateDesignation']);
     Route::post('update-employee-reporting',[EmployeeUpdateController::class,'updateReporting']); 
     Route::post('change-password',[AuthController::class,'updatePassword']);
-    Route::post('reset-password/{id}',[AuthController::class,'resetPassword']);
+    Route::get('reset-password/{id}',[AuthController::class,'resetPassword']);
 
     // User update 
     Route::resource('education',EducationController::class);
