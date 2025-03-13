@@ -67,6 +67,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('employee', EmployeeController::class);
     Route::post('update-employee-designation',[EmployeeUpdateController::class,'updateDesignation']);
     Route::post('update-employee-reporting',[EmployeeUpdateController::class,'updateReporting']); 
+    Route::post('change-password',[AuthController::class,'updatePassword']);
+    Route::post('reset-password/{id}',[AuthController::class,'resetPassword']);
 
     // User update 
     Route::resource('education',EducationController::class);
@@ -82,7 +84,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('contact-data/{user_id}',[UserContactController::class,'contact_data']);
     Route::put('update-contact/{id}',[UserContactController::class,'update_contact']);
     Route::post('add-contact',[UserContactController::class,'add_contact']); 
-    // Route::get('show-contact',[UserContactController::class,'show_contact']);
 
 
 

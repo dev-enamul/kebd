@@ -37,10 +37,25 @@ class AuthController extends Controller
         ]);  
         $user = User::find($request->id);
         if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['error' => 'Current password is incorrect'], 422);
+            return error_response(null,422,'Current password is incorrect'); 
         } 
         $user->password = Hash::make($request->new_password);
         $user->save(); 
         return success_response(null,"Password updated successfully"); 
+    } 
+
+    public function resetPassword($id)
+    {
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return error_response(null, 404, 'User not found');
+            } 
+            $user->password = Hash::make('123456');
+            $user->save();   
+            return success_response(null, "Password reset successfully. Default password: 123456");
+        } catch (\Exception $e) {
+            return error_response(null, 500, $e->getMessage());
+        }
     }
 }
