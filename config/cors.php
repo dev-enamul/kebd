@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://kebd-crm.vercel.app','http://localhost:7002'],
+    'allowed_origins' => ['https://kebd-crm.vercel.app','http://localhost:7002','http://kebd.mmadinah.com'],
 
     'allowed_origins_patterns' => [],
 
