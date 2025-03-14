@@ -51,7 +51,7 @@ class CustomerLeadHistoryController extends Controller
 
             $employee_id = $request->user_id ?? Auth::user()->id;  
 
-            $user = User::find($employee_id);
+            $employee = User::find($employee_id);
             $datas = FollowupLog::where('created_by', $employee_id)
                 ->whereBetween('created_at', [$startDate, $endDate]);
 
@@ -60,10 +60,9 @@ class CustomerLeadHistoryController extends Controller
             $total = $datas->count();
 
             // Apply transformation correctly
-            $logs = $logs->map(function ($log) use ($user) {
+            $logs = $logs->map(function ($log) {
                 return [
-                    'id'  => $log->id,
-                    'employee_name'     => $user->name??"-",
+                    'id'  => $log->id, 
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",
@@ -74,7 +73,7 @@ class CustomerLeadHistoryController extends Controller
             return success_response([
                 'data' => $logs,
                 'meta' => [
-                    'employee_name' => $$user->name??"-",
+                    'employee_name' => $employee->name,
                     'total' => $total,
                     'per_page' => $perPage,
                     'current_page' => $currentPage
