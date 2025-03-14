@@ -49,7 +49,7 @@ class CustomerLeadHistoryController extends Controller
                 ? Carbon::parse($request->end_date)->endOfDay() 
                 : Carbon::today()->endOfDay(); 
 
-            $employee_id = $request->user_id ?? Auth::id();  
+            $employee_id = $request->user_id ?? Auth::user()->id;  
 
             $user = User::find($employee_id);
             $datas = FollowupLog::where('created_by', $employee_id)
@@ -60,7 +60,7 @@ class CustomerLeadHistoryController extends Controller
             $total = $datas->count();
 
             // Apply transformation correctly
-            $logs = $logs->map(function ($log) {
+            $logs = $logs->map(function ($log) use ($user) {
                 return [
                     'id'  => $log->id,
                     'employee_name'     => $user->name??"-",
