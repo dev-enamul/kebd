@@ -30,7 +30,6 @@ class LoginService {
                         $permissions = $designation->permissions->pluck('slug')->toArray();
                     }
                 }
-                
             } 
             if (empty($permissions)) {
                 $permissions = [];
@@ -38,6 +37,7 @@ class LoginService {
             $data = [
                 'token' => $token,
                 'user' => [
+                    'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
                     'profile_image' => $user->profile_image,
