@@ -41,9 +41,15 @@ class CustomerLeadHistoryController extends Controller
             $perPage = $request->get('per_page', 20);   
             $currentPage = $request->get('page', 1);   
 
-            $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
-            $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
-            $employee_id = $request->user_id ?? Auth::id(); // Using Auth::id() is cleaner
+            $startDate = $request->start_date 
+                ? Carbon::parse($request->start_date)->startOfDay()  
+                : Carbon::today()->startOfDay();  
+
+            $endDate = $request->end_date 
+                ? Carbon::parse($request->end_date)->endOfDay() 
+                : Carbon::today()->endOfDay(); 
+
+            $employee_id = $request->user_id ?? Auth::id();  
 
             $user = User::find($employee_id);
             $datas = FollowupLog::where('created_by', $employee_id)
@@ -57,7 +63,7 @@ class CustomerLeadHistoryController extends Controller
             $logs = $logs->map(function ($log) {
                 return [
                     'id'  => $log->id,
-                    'employee_name'     => @$log->followupBy->name??"-",
+                    'employee_name'     => $user->name??"-",
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
                     "date"              => $log->created_at ?? "-",

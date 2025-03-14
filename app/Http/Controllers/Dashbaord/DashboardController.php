@@ -28,8 +28,13 @@ class DashboardController extends Controller
 
     public function cardData(Request $request){
         try{
-            $startDate = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
-            $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
+            $startDate = $request->start_date 
+                ? Carbon::parse($request->start_date)->startOfDay()  
+                : Carbon::today()->startOfDay();  
+
+            $endDate = $request->end_date 
+                ? Carbon::parse($request->end_date)->endOfDay()  
+                : Carbon::today()->endOfDay(); 
             $employee_id = $request->user_id ?? Auth::user()->id;
 
             $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate]);
