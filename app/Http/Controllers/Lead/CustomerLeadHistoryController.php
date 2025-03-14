@@ -45,6 +45,7 @@ class CustomerLeadHistoryController extends Controller
             $endDate = $request->end_date ?? Carbon::now()->endOfMonth()->toDateString(); 
             $employee_id = $request->user_id ?? Auth::id(); // Using Auth::id() is cleaner
 
+            $user = User::find($employee_id);
             $datas = FollowupLog::where('created_by', $employee_id)
                 ->whereBetween('created_at', [$startDate, $endDate]);
 
@@ -55,6 +56,7 @@ class CustomerLeadHistoryController extends Controller
             // Apply transformation correctly
             $logs = $logs->map(function ($log) {
                 return [
+                    'id'  => $log->id,
                     'employee_name'     => @$log->followupBy->name??"-",
                     "project_name"      => optional($log->user)->project_name ?? "-",
                     "followup_category" => optional($log->followupCategory)->title ?? "-",
@@ -66,6 +68,7 @@ class CustomerLeadHistoryController extends Controller
             return success_response([
                 'data' => $logs,
                 'meta' => [
+                    'employee_name' => $$user->name??"-",
                     'total' => $total,
                     'per_page' => $perPage,
                     'current_page' => $currentPage
