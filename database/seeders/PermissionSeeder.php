@@ -66,7 +66,9 @@ class PermissionSeeder extends Seeder
             // 'account',
             // 'own-account',
             // 'own-team-account',
-            // 'all-account',
+            // 'all-account', 
+            
+            'report',
             'setting'
         ];  
 
