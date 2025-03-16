@@ -22,6 +22,8 @@ class CustomerLeadHistoryController extends Controller
             $lead_history = $lead_history->map(function ($lead) {  
                 
                 return [ 
+                    'id' => $lead->id,
+                    'user_id' => $lead->user_id,
                     'employee_name' => $lead->assignTo->name??"-",
                     'status' => $lead->status,
                     'service' => @$lead->service->title ?? "-", 
