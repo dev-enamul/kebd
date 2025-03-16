@@ -95,6 +95,7 @@ class LeadController extends Controller
                 'next_followup_date' => $salesPipeline['next_followup_date'] ?? null,
                 'last_contacted_at' => $salesPipeline['last_contacted_at'] ?? null,
                 'service' => $salesPipeline['service_name'] ?? null,
+                'lead_category' => $salesPipeline['lead_category'] ?? null,
             ];
         })->values()->toArray();
 
