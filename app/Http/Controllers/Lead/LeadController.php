@@ -51,7 +51,7 @@ class LeadController extends Controller
             ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
             ->leftJoin('followup_categories', 'sales_pipelines.followup_categorie_id', '=', 'followup_categories.id')
             ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
-                    'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name', 'users.email as user_email', 'users.phone as user_phone', 
+                    'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name','users.profile_image', 'users.email as user_email', 'users.phone as user_phone', 
                     'services.id as service_id', 'services.title as service_name','followup_categories.title as lead_category')
             ->where('sales_pipelines.status', $status);
 
@@ -83,19 +83,20 @@ class LeadController extends Controller
     { 
         $groupedData = collect($datas)->groupBy('lead_id')->map(function ($salesPipelines) {
             $salesPipeline = $salesPipelines->first();
+
             return [
-                'id' => $salesPipeline['lead_id'],
-                'user_id' => $salesPipeline['user_id'],
-                'project_name' => $salesPipeline['project_name'],
-                'client_name' => $salesPipeline['client_name'],
-                'profile_image' => $salesPipeline['profile_image'],
-                'email' => $salesPipeline['user_email'],
-                'phone' => $salesPipeline['user_phone'],
-                'next_followup_date' => $salesPipeline['next_followup_date'],
-                'last_contacted_at' => $salesPipeline['last_contacted_at'],
-                'service' => $salesPipeline['service_name'],
+                'id' => $salesPipeline['lead_id'] ?? null,
+                'user_id' => $salesPipeline['user_id'] ?? null,
+                'project_name' => $salesPipeline['project_name'] ?? null,
+                'client_name' => $salesPipeline['client_name'] ?? null,
+                'profile_image' => $salesPipeline['profile_image'] ?? null, // ✅ Now it's available
+                'email' => $salesPipeline['user_email'] ?? null,
+                'phone' => $salesPipeline['user_phone'] ?? null,
+                'next_followup_date' => $salesPipeline['next_followup_date'] ?? null,
+                'last_contacted_at' => $salesPipeline['last_contacted_at'] ?? null,
+                'service' => $salesPipeline['service_name'] ?? null,
             ];
-        })->values()->toArray(); // Ensure it is an array
+        })->values()->toArray();
 
         $sortedData = collect($groupedData)->sortBy('next_followup_date')->values()->toArray(); 
 
@@ -104,13 +105,11 @@ class LeadController extends Controller
 
         $pagedData = array_slice($sortedData, ($currentPage - 1) * $perPage, $perPage);
 
-        $totalItems = count($sortedData);
-
         return [
-            'data' => array_values($pagedData), // Ensure indexed array
+            'data' => array_values($pagedData),
             'meta' => [
                 'current_page' => $currentPage,
-                'total_items' => $totalItems,
+                'total_items' => count($sortedData),
                 'per_page' => $perPage,
             ],
         ];
