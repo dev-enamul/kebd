@@ -84,23 +84,26 @@ class LeadController extends Controller
     { 
         $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
             $salesPipeline = $salesPipelines->first();
-            $services = $salesPipelines->map(function ($pipeline) {
-                return [
-                    'id' => $pipeline->service_id,
-                    'name' => $pipeline->service_name,
-                ];
-            });
+            // $services = $salesPipelines->map(function ($pipeline) {
+            //     return [
+            //         'id' => $pipeline->service_id,
+            //         'name' => $pipeline->service_name,
+            //     ];
+            // });
 
             return [
                 'id' => $salesPipeline->lead_id,
                 'user_id' => $salesPipeline->user_id,
-                'name' => $salesPipeline->user_name,
+                'project_name' => $salesPipeline->user->project_name,
+                'client_name' => $salesPipeline->user->client_name,
+                'profile_image' => $salesPipeline->user->profile_image,
                 'email' => $salesPipeline->user_email,
                 'phone' => $salesPipeline->user_phone,
                 'next_followup_date' => $salesPipeline->next_followup_date,
                 'last_contacted_at' => $salesPipeline->last_contacted_at,
-                'services' => $services,
-            ];
+                'service' => $salesPipeline->service->title,
+            ]; 
+
         })->values(); 
         $sortedData = $groupedData->sortBy('next_followup_date'); 
         $perPage = $request->get('per_page', 20);
