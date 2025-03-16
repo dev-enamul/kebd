@@ -314,8 +314,7 @@ class LeadController extends Controller
             if (!$lead) {
                 return error_response('Lead not found', 404);
             }
- 
-            $services = $lead->services->pluck('title');
+  
             $followup = $lead->followup;
  
             $user = User::find($lead->user_id); 
@@ -325,7 +324,10 @@ class LeadController extends Controller
  
             return success_response([ 
                 'user_id' => $user->id,
-                'services' => $services,
+                'service' => $lead->service->title,
+                'service_id' => $lead->service_id,
+                'qty' => $lead->qty,
+                'service_details' => $lead->service_details,
                 "name" => $user->name,
                 "project_name" => $user->project_name,
                 "client_name" => $user->client_name,
