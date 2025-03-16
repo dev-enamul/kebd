@@ -47,9 +47,7 @@ class LeadController extends Controller
     private function buildQuery($status, $category)
     { 
         $query = SalesPipeline::query()
-            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
-            // ->leftJoin('sales_pipeline_services', 'sales_pipelines.id', '=', 'sales_pipeline_services.sales_pipeline_id')
-            // ->leftJoin('services', 'sales_pipeline_services.service_id', '=', 'services.id')
+            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id') 
             ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
             ->leftJoin('followup_categories', 'sales_pipelines.followup_categorie_id', '=', 'followup_categories.id')
             ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
@@ -65,63 +63,59 @@ class LeadController extends Controller
     }
 
     private function filterByPermissions($query, $authUser)
-    { 
+    {
         if (can('all-lead')) {
-            return $query->get();
+            return $query->get()->toArray(); // Convert collection to array
         } elseif (can('own-team-lead')) {
             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get();
+            return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
         } elseif (can('own-lead')) {
             $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get();
+            return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get()->toArray();
         } else {
-            return collect();
+            return [];  
         }
-    } 
+    }
+    
 
 
     private function processAndPaginate($datas, $request)
     { 
-        $groupedData = $datas->groupBy('lead_id')->map(function ($salesPipelines) {
+        $groupedData = collect($datas)->groupBy('lead_id')->map(function ($salesPipelines) {
             $salesPipeline = $salesPipelines->first();
-            // $services = $salesPipelines->map(function ($pipeline) {
-            //     return [
-            //         'id' => $pipeline->service_id,
-            //         'name' => $pipeline->service_name,
-            //     ];
-            // });
-
             return [
-                'id' => $salesPipeline->lead_id,
-                'user_id' => $salesPipeline->user_id,
-                'project_name' => $salesPipeline->user->project_name,
-                'client_name' => $salesPipeline->user->client_name,
-                'profile_image' => $salesPipeline->user->profile_image,
-                'email' => $salesPipeline->user_email,
-                'phone' => $salesPipeline->user_phone,
-                'next_followup_date' => $salesPipeline->next_followup_date,
-                'last_contacted_at' => $salesPipeline->last_contacted_at,
-                'service' => $salesPipeline->service->title,
-            ]; 
+                'id' => $salesPipeline['lead_id'],
+                'user_id' => $salesPipeline['user_id'],
+                'project_name' => $salesPipeline['project_name'],
+                'client_name' => $salesPipeline['client_name'],
+                'profile_image' => $salesPipeline['profile_image'],
+                'email' => $salesPipeline['user_email'],
+                'phone' => $salesPipeline['user_phone'],
+                'next_followup_date' => $salesPipeline['next_followup_date'],
+                'last_contacted_at' => $salesPipeline['last_contacted_at'],
+                'service' => $salesPipeline['service_name'],
+            ];
+        })->values()->toArray(); // Ensure it is an array
 
-        })->values(); 
-        $sortedData = $groupedData->sortBy('next_followup_date'); 
+        $sortedData = collect($groupedData)->sortBy('next_followup_date')->values()->toArray(); 
+
         $perPage = $request->get('per_page', 20);
-        $currentPage = $request->get('page', 1); 
-        $pagedData = $sortedData->forPage($currentPage, $perPage);
-    
-        $totalItems = $sortedData->count();  
-        $pagination = [
-            'current_page' => $currentPage, 
-            'total_items' => $totalItems,
-            'per_page' => $perPage,
-        ];
+        $currentPage = $request->get('page', 1);
+
+        $pagedData = array_slice($sortedData, ($currentPage - 1) * $perPage, $perPage);
+
+        $totalItems = count($sortedData);
 
         return [
-            'data' => $pagedData,
-            'meta' => $pagination,
+            'data' => array_values($pagedData), // Ensure indexed array
+            'meta' => [
+                'current_page' => $currentPage,
+                'total_items' => $totalItems,
+                'per_page' => $perPage,
+            ],
         ];
     }
+
 
 
     public function leadReport(Request $request){
