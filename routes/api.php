@@ -19,6 +19,7 @@ use App\Http\Controllers\Followup\FollowupController;
 use App\Http\Controllers\Lead\CustomerLeadHistoryController;
 use App\Http\Controllers\Lead\LeadAssignController;
 use App\Http\Controllers\Lead\LeadController;
+use App\Http\Controllers\Lead\LeadServiceController;
 use App\Http\Controllers\Lead\RejectionController;
 use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Payment\PaymentController;
@@ -89,6 +90,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::resource('lead', LeadController::class);
     Route::get('lead-customer-profile/{id}',[LeadController::class,'profile']);
+    Route::resource('lead-service', LeadServiceController::class);
    
     Route::post('lead-assign-to',LeadAssignController::class);
     Route::resource('followup', FollowupController::class);

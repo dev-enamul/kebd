@@ -323,11 +323,7 @@ class LeadController extends Controller
             } 
  
             return success_response([ 
-                'user_id' => $user->id,
-                'service' => $lead->service->title,
-                'service_id' => $lead->service_id,
-                'qty' => $lead->qty,
-                'service_details' => $lead->service_details,
+                'user_id' => $user->id, 
                 "name" => $user->name,
                 "project_name" => $user->project_name,
                 "client_name" => $user->client_name,
