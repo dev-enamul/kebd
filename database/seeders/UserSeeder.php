@@ -28,18 +28,18 @@ class UserSeeder extends Seeder
             'updated_by' => 1,
         ]);
  
-        $johnDoeUser = User::create([
-            'name' => 'Mehedi Hasan',  
-            'email' => 'john@example.com',
-            'phone' => '0987654321',
-            'user_type' => 'employee',
-            'password' => Hash::make('password123'),  
-            'dob' => '1995-03-10',
-            'gender' => 'female',   
-            'blood_group' => 'B-',
-            'created_by' => 1,
-            'updated_by' => 1,
-        ]);
+        // $johnDoeUser = User::create([
+        //     'name' => 'Mehedi Hasan',  
+        //     'email' => 'john@example.com',
+        //     'phone' => '0987654321',
+        //     'user_type' => 'employee',
+        //     'password' => Hash::make('password123'),  
+        //     'dob' => '1995-03-10',
+        //     'gender' => 'female',   
+        //     'blood_group' => 'B-',
+        //     'created_by' => 1,
+        //     'updated_by' => 1,
+        // ]);
  
         Employee::create([
             'user_id' => $adminUser->id,
@@ -54,17 +54,17 @@ class UserSeeder extends Seeder
             'updated_by' => 1,
         ]);
  
-        Employee::create([
-            'user_id' => $johnDoeUser->id,
-            'employee_id' => Employee::generateNextEmployeeId(),
-            'designation_id' => 2,   
-            'referred_by' => $adminUser->id, 
-            'signature' => 'John Signature',
-            'salary' => 60000,
-            'status' => 1,
-            'resigned_at' => null,
-            'created_by' => 1,
-            'updated_by' => 1,
-        ]);
+        // Employee::create([
+        //     'user_id' => $johnDoeUser->id,
+        //     'employee_id' => Employee::generateNextEmployeeId(),
+        //     'designation_id' => 2,   
+        //     'referred_by' => $adminUser->id, 
+        //     'signature' => 'John Signature',
+        //     'salary' => 60000,
+        //     'status' => 1,
+        //     'resigned_at' => null,
+        //     'created_by' => 1,
+        //     'updated_by' => 1,
+        // ]);
     }
 }
