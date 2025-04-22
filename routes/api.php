@@ -31,9 +31,7 @@ use App\Http\Controllers\User\EducationController;
 use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\User\UserContactController;
 use App\Http\Controllers\User\UserEnglishController;
-use App\Http\Controllers\User\UserUpdateController;
-use App\Models\FollowupCategory;
-use Illuminate\Http\Request;
+use App\Http\Controllers\User\UserUpdateController; 
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -97,6 +95,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::resource('lead-rejection',RejectionController::class);
     Route::post('rejection-to-lead',[RejectionController::class,'rejectToLead']);
+    Route::post('customer-to-lead',[CustomerController::class,'rejectToLead']);
  
 
     // Salese 

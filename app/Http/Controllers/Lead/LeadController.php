@@ -45,7 +45,7 @@ class LeadController extends Controller
     }
 
     private function buildQuery($status, $category)
-    { 
+    {
         $query = SalesPipeline::query()
             ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id') 
             ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
@@ -192,13 +192,14 @@ class LeadController extends Controller
 
             $followup_category = FollowupCategory::orderBy('serial', 'asc')->first(); 
             $pipeline = SalesPipeline::create([
-                'user_id'       => $user->id,
-                'customer_id'   => $customer->id,
-                'service_id'    => $request->service_id,
-                'service_details' => $request->service_details,
-                'qty'           => $request->qty,
+                'user_id'           => $user->id,
+                'customer_id'       => $customer->id,
+                'service_id'        => $request->service_id,
+                'service_details'   => $request->service_details,
+                'qty'               => $request->qty,
                 'followup_categorie_id' => $followup_category->id,
-                'assigned_to'   => $authUser->id,
+                'assigned_to'       => $authUser->id,
+                'type'              => $request->type,
             ]);
 
             // if(isset($request->service_ids) && count($request->service_ids)>0){
