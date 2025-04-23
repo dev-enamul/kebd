@@ -18,6 +18,7 @@ class SalesPipeline extends Model
         'followup_categorie_id',
         'purchase_probability',
         'price',
+        'type',
         'next_followup_date',
         'last_contacted_at',
         'assigned_to',

@@ -26,7 +26,7 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         try {
-            if (!can("lead")) {
+            if (!can("customer")) {
                 return permission_error_response();
             } 
 
@@ -66,12 +66,12 @@ class CustomerController extends Controller
 
     private function filterByPermissions($query, $authUser)
     {
-        if (can('all-lead')) {
+        if (can('all-customer')) {
             return $query->get()->toArray(); // Convert collection to array
-        } elseif (can('own-team-lead')) {
+        } elseif (can('own-team-customer')) {
             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
             return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
-        } elseif (can('own-lead')) {
+        } elseif (can('own-customer')) {
             $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
             return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get()->toArray();
         } else {
@@ -102,7 +102,6 @@ class CustomerController extends Controller
         })->values()->toArray();
 
         $sortedData = collect($groupedData)->sortBy('next_followup_date')->values()->toArray(); 
-
         $perPage = $request->get('per_page', 20);
         $currentPage = $request->get('page', 1);
 
@@ -150,6 +149,108 @@ class CustomerController extends Controller
         } catch (Exception $e) {
             return error_response($e->getMessage());
         }
-    }
+    } 
+
+    public function store(CustomerStoreRequest $request)
+    {
+        if (!can("create-lead")) {
+            return permission_error_response();
+        } 
+          
+        $authUser = Auth::user(); 
+        DB::beginTransaction();
+        try {
+            $profilePicPath = null;
+            if ($request->hasFile('profile_image')) {
+                $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
+            }
+            
+            $user = User::create([
+                'project_name'          => $request->project_name,
+                'client_name'          => $request->client_name,
+                'email'         => $request->client_office_email,
+                'phone'         => $request->client_office_phone,
+                'password'      => Hash::make("12345678"),
+
+                'user_type'     => 'customer',  
+                'profile_image' => $profilePicPath,  
+                'dob'           => $request->dob, 
+                'blood_group'   => $request->blood_group, 
+                'gender'        => $request->gender, 
+                'created_by'    => $authUser->id,
+            ]);
+
+            $customer = Customer::create([ 
+                'user_id' => $user->id,
+                'lead_source_id'    => $request->lead_source_id,
+                'referred_by'       => $request->referred_by,  
+                'created_by' => $authUser->id,
+            ]);
+
+            $followup_category = FollowupCategory::orderBy('serial', 'asc')->first(); 
+            $pipeline = SalesPipeline::create([
+                'user_id'           => $user->id,
+                'customer_id'       => $customer->id,
+                'service_id'        => $request->service_id,
+                'service_details'   => $request->service_details,
+                'qty'               => $request->qty,
+                'followup_categorie_id' => $followup_category->id,
+                'assigned_to'       => $authUser->id,
+                'type'              => "customer_data",
+            ]);
+
+           
+
+            $leadCategory = FollowupCategory::where('status',1)->first();
+            FollowupLog::create([
+                'user_id' => $user->id,
+                'followup_categorie_id' => $leadCategory->id,
+                'customer_id' => $customer->id,
+                'pipeline_id' => $pipeline->id,
+                'followup_category_id' => $followup_category->id,
+                'notes' => $request->notes,
+                'created_by' => Auth::user()->id
+            ]);
+ 
+            UserContact::create([
+                'user_id'       => $user->id,
+                'name'          => $request->client_name,
+                'role'          => "Client Office",
+                'phone'         => $request->client_office_phone, 
+                'email'         => $request->office_email, 
+                'address'       => $request->client_office_email,  
+
+                'whatsapp'      => $request->whatsapp,
+                'imo'           => $request->imo,
+                'facebook'      => $request->facebook,
+                'linkedin'      => $request->linkedin,
+            ]);
+
+            if($request->site_person!=null){
+                UserContact::create([
+                    'user_id'       => $user->id,
+                    'name'          => $request->site_person,
+                    'role'          => "Site",
+                    'phone'         => $request->site_phone,
+                    'email'         => $request->site_email, 
+                    'address'       => $request->site_address,
+    
+                    'whatsapp'      => $request->whatsapp,
+                    'imo'           => $request->imo,
+                    'facebook'      => $request->facebook,
+                    'linkedin'      => $request->linkedin,
+                ]);
+            }
+            
+  
+            DB::commit();  
+            return success_response(null,'Lead has been created');
+
+        } catch (\Exception $e) { 
+            DB::rollBack();  
+            return error_response($e->getMessage(), 500);
+        }
+    } 
+
   
 }
