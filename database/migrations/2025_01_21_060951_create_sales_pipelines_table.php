@@ -26,7 +26,7 @@ return new class extends Migration
             
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); 
             $table->enum('status', ['Active', 'Rejected', 'Salsed', 'Waiting'])->default('Active');
-            $table->enum('type', ['customer_data', 'lead_data'])->default('Active');
+            $table->enum('type', ['customer_data', 'lead_data']);
             $table->timestamps(); 
         });
     }
