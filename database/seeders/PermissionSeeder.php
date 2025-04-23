@@ -28,7 +28,14 @@ class PermissionSeeder extends Seeder
             'own-team-lead',
             'all-lead', 
             'create-lead',
-            'manage-lead', 
+            'manage-lead',
+
+            'customer',
+            'own-customer',
+            'own-team-customer',
+            'all-customer', 
+            'create-customer',
+            'manage-customer',
 
             'rejection',
             'own-rejection',
