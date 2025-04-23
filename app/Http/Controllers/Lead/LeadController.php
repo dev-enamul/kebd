@@ -53,7 +53,8 @@ class LeadController extends Controller
             ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
                     'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name','users.profile_image', 'users.email as user_email', 'users.phone as user_phone', 
                     'services.id as service_id', 'services.title as service_name','followup_categories.title as lead_category')
-            ->where('sales_pipelines.status', $status);
+            ->where('sales_pipelines.status', $status)
+            ->where('sales_pipelines.type', 'lead_data');
 
         if (isset($category) && $category != null) {
             $query->where('sales_pipelines.followup_categorie_id', $category);
