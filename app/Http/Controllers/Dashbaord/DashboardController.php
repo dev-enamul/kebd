@@ -37,7 +37,7 @@ class DashboardController extends Controller
                 : Carbon::today()->endOfDay(); 
             $employee_id = $request->user_id ?? Auth::user()->id;
 
-            $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate]);
+            $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate])->where('type','lead_data');
             $return_data = [
                 'lead_collect' => $data->count(),
                 'lead_active' => $data->where('status','Active')->count(),
