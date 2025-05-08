@@ -38,7 +38,8 @@ class DashboardController extends Controller
             $employee_id = $request->user_id ?? Auth::user()->id;
 
             $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate])->where('type','lead_data');
-            $followup = $data->where('followup_categorie_id', 4)
+            $followup =  SalesPipeline::where('assigned_to',$employee_id)
+                  ->where('followup_categorie_id', 4)
                   ->whereDate('next_followup_date', '<=', Carbon::today())
                   ->count();
             $return_data = [
