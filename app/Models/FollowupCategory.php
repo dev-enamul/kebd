@@ -15,4 +15,8 @@ class FollowupCategory extends Model
         'status',
         'serial',
     ];
+
+    public function countFolowup(){
+        return $this->hasMany(SalesPipeline::class,'followup_categorie_id')->count();
+    }
 }

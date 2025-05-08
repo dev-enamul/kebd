@@ -35,20 +35,28 @@ class CustomerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_name'      => 'required|string|max:255',
-            'client_name'       => 'required|string|max:255',
-            'service_id'       => 'required|exists:services,id', 
-            'qty'               => 'nullable|integer',  
-
-            'client_office_address'      => 'required|string|max:255',
-            'client_office_person'      => 'required|string|max:255',
-            'client_office_phone'      => 'required|string|max:255',
-            'client_office_email'      => 'required|string|max:255',
-
-            'site_address'      => 'required|string|max:255',
-            'site_person'      => 'required|string|max:255',
-            'site_phone'      => 'required|string|max:255',
-            'site_email'      => 'required|string|max:255', 
+            'project_name'  => 'required|string|max:255',
+            'client_name'   => 'required|string|max:255',
+            'service_id'    => 'nullable|exists:services,id',
+            'qty'           => 'nullable|integer',
+            'lead_source_id'=> 'nullable|exists:lead_sources,id',
+            'referred_by'   => 'nullable|string|max:255',
+            'dob'           => 'nullable|date',
+            'blood_group'   => 'nullable|string|max:10',
+            'gender'        => 'nullable|in:male,female,other',
+            'notes'         => 'nullable|string',
+    
+            'contacts'                  => 'required|array|min:1',
+            'contacts.*.name'           => 'required|string|max:255',
+            'contacts.*.factory_name'   => 'nullable|string|max:255',
+            'contacts.*.role'           => 'nullable|string|max:255',
+            'contacts.*.phone'          => 'required|string|max:255',
+            'contacts.*.email'          => 'nullable|email|max:255',
+            'contacts.*.whatsapp'       => 'nullable|string|max:255',
+            'contacts.*.imo'            => 'nullable|string|max:255',
+            'contacts.*.facebook'       => 'nullable|string|max:255',
+            'contacts.*.linkedin'       => 'nullable|string|max:255',
+            'contacts.*.address'        => 'nullable|string|max:255',
         ];
     }
 }

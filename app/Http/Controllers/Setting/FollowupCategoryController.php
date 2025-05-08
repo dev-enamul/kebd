@@ -22,6 +22,17 @@ class FollowupCategoryController extends Controller
             }else{
                 $categories = FollowupCategory::where('status', $status)->select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
             } 
+            $categories->map(function($query){
+                return [
+                    'id' => $query->id,
+                    'title' => $query->title,
+                    'slug' => $query->slug,
+                    'status' => $query->status,
+                    'serial' => $query->serial,
+                    'value' => $query->countFolowup(), 
+                ];
+            });
+            
             return success_response($categories);
         } catch (Exception $e) {
             return error_response($e->getMessage(), $e->getCode());

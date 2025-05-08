@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('user_contacts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained(); 
-            $table->string('name');
-            $table->string('role');
+            $table->string('name')->nullable();
+            $table->string('factory_name')->nullable();
+            $table->string('role')->nullable();
             $table->string('phone', 20)->nullable(); 
             $table->string('email', 45)->nullable(); 
             $table->text('address')->nullable(); 
@@ -36,3 +37,4 @@ return new class extends Migration
         Schema::dropIfExists('user_contacts');
     }
 };
+

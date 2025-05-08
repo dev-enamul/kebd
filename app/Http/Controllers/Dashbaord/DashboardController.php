@@ -39,10 +39,10 @@ class DashboardController extends Controller
 
             $data  = SalesPipeline::where('assigned_to',$employee_id)->whereBetween('created_at', [$startDate, $endDate])->where('type','lead_data');
             $return_data = [
-                'lead_collect' => $data->count(),
+                'followup' => $data->where('followup_categorie_id',4)->count(),
                 'lead_active' => $data->where('status','Active')->count(),
                 'lead_rejected' => $data->where('status','Rejected')->count(),
-                'deal_close' => $data->where('status','Salsed')->count(),
+                'lead_collect' => $data->count(),
             ]; 
             return success_response($return_data);
         }catch(Exception $e){

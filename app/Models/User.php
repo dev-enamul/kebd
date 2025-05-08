@@ -62,9 +62,9 @@ class User extends Authenticatable
         return $this->hasMany(UserAddress::class, 'user_id');
     }
 
-    public function contact()
+    public function contacts()
     {
-        return $this->hasOne(UserContact::class, 'user_id');
+        return $this->hasMany(UserContact::class, 'user_id');
     }
 
     public function educations()
