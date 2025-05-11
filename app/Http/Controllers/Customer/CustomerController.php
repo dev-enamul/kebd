@@ -25,59 +25,66 @@ class CustomerController extends Controller
      */ 
 
      public function index(Request $request)
-     {
-         if (!can("customer")) {
-             return permission_error_response();
-         }
-     
-         $keyword = $request->keyword;
-         $authUser = User::find(Auth::id());
-     
-         $contactsQuery = UserContact::with(['user' => function ($q) {
-             $q->select('id', 'project_name', 'client_name', 'user_type');
-         }])->whereHas('user', function ($q) {
-             $q->where('user_type', 'customer');
-         });
-      
-         if (can('own-team-customer')) {
-             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-             $contactsQuery->whereHas('user.salesPipelines', function ($q) use ($juniorUserIds) {
-                 $q->whereIn('assigned_to', $juniorUserIds);
-             });
-         } elseif (can('own-customer')) {
-             $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-             $contactsQuery->whereHas('user.salesPipelines', function ($q) use ($directJuniors) {
-                 $q->whereIn('assigned_to', $directJuniors);
-             });
-         } elseif (!can('all-customer')) {
-             return success_response([]);
-         }
-      
-         if ($keyword) {
-             $contactsQuery->where(function ($q) use ($keyword) {
-                 $q->where('name', 'like', "%{$keyword}%")
-                   ->orWhere('role', 'like', "%{$keyword}%")
-                   ->orWhereHas('user', function ($uq) use ($keyword) {
-                       $uq->where('project_name', 'like', "%{$keyword}%")
-                          ->orWhere('client_name', 'like', "%{$keyword}%")
-                          ->orWhere('name', 'like', "%{$keyword}%");
-                   });
-             });
-         }
-     
-         $contacts = $contactsQuery->get(); 
-         $response = $contacts->map(function ($contact) {
-             return [
-                 "id" => $contact->user->id,
-                 "project_name" => $contact->user->project_name,
-                 "client_name" => $contact->user->client_name,
-                 "contact_person_name" => $contact->name,
-                 "contact_person_designation" => $contact->role,
-             ];
-         });
-     
-         return success_response($response);
-     }
+    {
+        if (!can("customer")) {
+            return permission_error_response();
+        }
+
+        $keyword = $request->keyword;
+        $authUser = User::find(Auth::id());
+
+        $datas = User::where('user_type', "customer")
+            ->with(['contacts', 'salesPipelines']);
+
+        // Permission based filtering
+        if (can('all-customer')) {
+            // No extra filter
+        } elseif (can('own-team-customer')) {
+            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+            $datas = $datas->whereHas('salesPipelines', function ($q) use ($juniorUserIds) {
+                $q->whereIn('assigned_to', $juniorUserIds);
+            });
+        } elseif (can('own-customer')) {
+            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+            $datas = $datas->whereHas('salesPipelines', function ($q) use ($directJuniors) {
+                $q->whereIn('assigned_to', $directJuniors);
+            });
+        } else {
+            return success_response([]);
+        }
+
+        // Keyword filter
+        if ($keyword) {
+            $datas = $datas->where(function ($q) use ($keyword) {
+                $q->where('project_name', 'like', "%{$keyword}%")
+                ->orWhere('client_name', 'like', "%{$keyword}%")
+                ->orWhere('name', 'like', "%{$keyword}%")
+                ->orWhereHas('contacts', function ($contactQuery) use ($keyword) {
+                    $contactQuery->where('role', 'like', "%{$keyword}%")
+                                ->orWhere('name', 'like', "%{$keyword}%");
+                });
+            });
+        }
+
+        $datas = $datas->get();
+
+        $contacts = collect();
+
+        foreach ($datas as $user) {
+            foreach ($user->contacts as $contact) {
+                $contacts->push([
+                    "id" => $user->id,
+                    "project_name" => $user->project_name,
+                    "client_name" => $user->client_name,
+                    "contact_person_name" => $contact->name,
+                    "contact_person_designation" => $contact->role,
+                ]);
+            }
+        }
+
+        return success_response($contacts);
+    }
+
      
 
 
