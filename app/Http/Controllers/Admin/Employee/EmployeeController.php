@@ -136,13 +136,15 @@ class EmployeeController extends Controller
                 'start_date' => now() 
             ]); 
 
-            UserReporting::create([
-                'user_id' => $user->id, 
-                'reporting_user_id' => $request->reporting_user_id,
-                'start_date' => now() 
-            ]);
-  
-            UpdateReportingJob::dispatch($request->reporting_user_id, $user->id);
+            if(isset($request->reporting_user_id) && $request->reporting_user_id!=null){
+                UserReporting::create([
+                    'user_id' => $user->id, 
+                    'reporting_user_id' => $request->reporting_user_id,
+                    'start_date' => now() 
+                ]); 
+                UpdateReportingJob::dispatch($request->reporting_user_id, $user->id);
+            }
+            
             DB::commit();  
             return success_response(null,'Employee has been created'); 
 
