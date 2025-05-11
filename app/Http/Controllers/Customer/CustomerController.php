@@ -24,137 +24,61 @@ class CustomerController extends Controller
      * Display a listing of the resource.
      */ 
 
-     public function index(Request $request){
-        if (!can("customer")) {
-            return permission_error_response();
-        }  
-    
-        $keyword = $request->keyword;
-        $authUser = User::find(Auth::user()->id);
-    
-        $datas = User::where('user_type', "customer")
-            ->with(['contacts', 'salesPipelines']);
+     public function index(Request $request)
+     {
+         if (!can("customer")) {
+             return permission_error_response();
+         }
      
-        if (can('all-customer')) {
-            // no extra filter
-        } elseif (can('own-team-customer')) {
-            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            $datas = $datas->whereHas('salesPipelines', function($q) use ($juniorUserIds) {
-                $q->whereIn('assigned_to', $juniorUserIds);
-            });
-        } elseif (can('own-customer')) {
-            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            $datas = $datas->whereHas('salesPipelines', function($q) use ($directJuniors) {
-                $q->whereIn('assigned_to', $directJuniors);
-            });
-        } else {
-            return success_response([]);
-        }
-    
-        // Keyword filter
-        if ($keyword) {
-            $datas = $datas->where(function ($q) use ($keyword) {
-                $q->where('project_name', 'like', "%{$keyword}%")
-                  ->orWhere('client_name', 'like', "%{$keyword}%")
-                  ->orWhere('name', 'like', "%{$keyword}%")
-                  ->orWhereHas('contacts', function ($contactQuery) use ($keyword) {
-                      $contactQuery->where('role', 'like', "%{$keyword}%");
-                  });
-            });
-        }
-    
-        $datas = $datas->get();
-    
-        $contacts = $datas->map(function($query){
-            return [
-                "id" => $query->id,
-                "project_name" => $query->project_name,
-                "client_name" => $query->client_name,
-                "contact_person_name" => $query->name,
-                "contact_person_designation" => $query->contacts->first()->role ?? "-",
-            ];
-        });
-    
-        return success_response($contacts);
-    }
-    
-
-    public function abc(Request $request)
-    {
-        try {
-            if (!can("customer")) {
-                return permission_error_response();
-            }   
-            $status = $request->status ?? "Active";
-            $authUser = User::find(Auth::user()->id);
- 
-            $query = $this->buildQuery($status);
-        
-            $datas = $this->filterByPermissions($query, $authUser); 
-            $pagedData = $this->processAndPaginate($datas, $request);
-
-            return success_response($pagedData);
-        } catch (Exception $e) {
-            return error_response($e->getMessage(), 500);
-        }
-    }
-
-    private function buildQuery($status)
-    { 
-        $query = SalesPipeline::query()
-            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id') 
-            ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
-            ->leftJoin('followup_categories', 'sales_pipelines.followup_categorie_id', '=', 'followup_categories.id')
-            ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
-                    'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name','users.profile_image', 'users.email as user_email', 'users.phone as user_phone', 
-                    'services.id as service_id', 'services.title as service_name','followup_categories.title as lead_category')
-            ->where('sales_pipelines.status', $status);
-            // ->where('sales_pipelines.type', 'customer_data'); 
-        return $query;
-    }
-
-    private function filterByPermissions($query, $authUser)
-    {
-       
-    }
-    
-
-
-    private function processAndPaginate($datas, $request)
-    { 
-        $groupedData = collect($datas)->groupBy('lead_id')->map(function ($salesPipelines) {
-            $salesPipeline = $salesPipelines->first();
-
-            return [
-                'id' => $salesPipeline['lead_id'] ?? null,
-                'user_id' => $salesPipeline['user_id'] ?? null,
-                'project_name' => $salesPipeline['project_name'] ?? null,
-                'client_name' => $salesPipeline['client_name'] ?? null,
-                'profile_image' => $salesPipeline['profile_image'] ?? null,  
-                'email' => $salesPipeline['user_email'] ?? null,
-                'phone' => $salesPipeline['user_phone'] ?? null,
-                'next_followup_date' => $salesPipeline['next_followup_date'] ?? null,
-                'last_contacted_at' => $salesPipeline['last_contacted_at'] ?? null,
-                'service' => $salesPipeline['service_name'] ?? null,
-                'lead_category' => $salesPipeline['lead_category'] ?? null,
-            ];
-        })->values()->toArray();
-
-        $sortedData = collect($groupedData)->sortBy('next_followup_date')->values()->toArray(); 
-        $perPage = $request->get('per_page', 20);
-        $currentPage = $request->get('page', 1);
-
-        $pagedData = array_slice($sortedData, ($currentPage - 1) * $perPage, $perPage);
-
-        return [
-            'data' => array_values($pagedData),
-            'meta' => [
-                'current_page' => $currentPage,
-                'total_items' => count($sortedData),
-                'per_page' => $perPage,
-            ],
-        ];
-    }
+         $keyword = $request->keyword;
+         $authUser = User::find(Auth::id());
+     
+         $contactsQuery = UserContact::with(['user' => function ($q) {
+             $q->select('id', 'project_name', 'client_name', 'user_type');
+         }])->whereHas('user', function ($q) {
+             $q->where('user_type', 'customer');
+         });
+      
+         if (can('own-team-customer')) {
+             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+             $contactsQuery->whereHas('user.salesPipelines', function ($q) use ($juniorUserIds) {
+                 $q->whereIn('assigned_to', $juniorUserIds);
+             });
+         } elseif (can('own-customer')) {
+             $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+             $contactsQuery->whereHas('user.salesPipelines', function ($q) use ($directJuniors) {
+                 $q->whereIn('assigned_to', $directJuniors);
+             });
+         } elseif (!can('all-customer')) {
+             return success_response([]);
+         }
+      
+         if ($keyword) {
+             $contactsQuery->where(function ($q) use ($keyword) {
+                 $q->where('name', 'like', "%{$keyword}%")
+                   ->orWhere('role', 'like', "%{$keyword}%")
+                   ->orWhereHas('user', function ($uq) use ($keyword) {
+                       $uq->where('project_name', 'like', "%{$keyword}%")
+                          ->orWhere('client_name', 'like', "%{$keyword}%")
+                          ->orWhere('name', 'like', "%{$keyword}%");
+                   });
+             });
+         }
+     
+         $contacts = $contactsQuery->get(); 
+         $response = $contacts->map(function ($contact) {
+             return [
+                 "id" => $contact->user->id,
+                 "project_name" => $contact->user->project_name,
+                 "client_name" => $contact->user->client_name,
+                 "contact_person_name" => $contact->name,
+                 "contact_person_designation" => $contact->role,
+             ];
+         });
+     
+         return success_response($response);
+     }
+     
 
 
 
