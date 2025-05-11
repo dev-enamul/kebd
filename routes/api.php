@@ -96,7 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::resource('lead-rejection',RejectionController::class);
     Route::post('rejection-to-lead',[RejectionController::class,'rejectToLead']);
-    Route::post('customer-to-lead/{id}',[CustomerController::class,'customerToLead']);
+    Route::get('customer-to-lead/{id}',[CustomerController::class,'customerToLead']);
  
 
     // Salese 
