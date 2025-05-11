@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-            $table->foreignId('service_id')->constrained('services');
+            $table->foreignId('service_id')->nullable()->constrained('services');
             $table->string('service_details')->nullable();
             $table->integer('qty')->nullable()->default(1);
             $table->foreignId('followup_categorie_id')->constrained('followup_categories'); 
