@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->nullable()->comment('For Employee');
             $table->string('project_name')->nullable();
             $table->string('client_name')->nullable();
-            $table->string('phone', 20);
+            $table->string('phone', 20)->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
             $table->string('profile_image')->nullable();

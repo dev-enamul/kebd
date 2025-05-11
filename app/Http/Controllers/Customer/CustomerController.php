@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+use function Laravel\Prompts\error;
+
 class CustomerController extends Controller
 {
     /**
@@ -70,7 +72,8 @@ class CustomerController extends Controller
                     "id" => $user->id,
                     "project_name" => $user->project_name,
                     "client_name" => $user->client_name,
-                    "contact_person_name" => $contact->name ?? '',
+                    "factory_name" => $contact->name ?? '',
+                    "contact_person_name" => $contact->name ?? '', 
                     "contact_person_designation" => $contact->role ?? '',
                 ]);
             }
@@ -154,18 +157,32 @@ class CustomerController extends Controller
             return error_response($e->getMessage(), 500);
         }
     } 
+ 
+    public function customerToLead($id)
+    {
+        if (!is_numeric($id) || (int)$id != $id || (int)$id < 1) {
+            return error_response("Invalid ID. Must be a positive integer.");
+        }
 
-    public function customerToLead($id){
-        $user = User::find($id);
-        $authUser = Auth::user();
-        $customer = Customer::create([
-            'user_id'         => $user->id,
-            'lead_source_id'  => null,
-            'referred_by'     => $authUser->id,
-            'created_by'      => $authUser->id,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $followup_category = FollowupCategory::orderBy('serial', 'asc')->first();
+            $user = User::find($id);
+            if (!$user) {
+                return error_response("User not found.");
+            }
+
+            $authUser = Auth::user();
+
+            $customer = Customer::create([
+                'user_id'        => $user->id,
+                'lead_source_id' => null,
+                'referred_by'    => $authUser->id,
+                'created_by'     => $authUser->id,
+            ]);
+
+            $followup_category = FollowupCategory::orderBy('serial', 'asc')->first();
+
             $pipeline = SalesPipeline::create([
                 'user_id'               => $user->id,
                 'customer_id'           => $customer->id,
@@ -176,21 +193,24 @@ class CustomerController extends Controller
                 'assigned_to'           => $authUser->id,
                 'type'                  => "lead_data",
             ]);
- 
-            $leadCategory = FollowupCategory::where('status', 1)->first();
+
             FollowupLog::create([
                 'user_id'               => $user->id,
-                'followup_categorie_id' => $leadCategory->id,
+                'followup_categorie_id'=> $followup_category->id,
                 'customer_id'           => $customer->id,
                 'pipeline_id'           => $pipeline->id,
-                'followup_category_id'  => $followup_category->id,
                 'notes'                 => "Created as lead to customer data",
                 'created_by'            => $authUser->id,
             ]);
 
-        
-    }
+            DB::commit();
+            return success_response("Lead created successfully");
 
+        } catch (Exception $e) {
+            DB::rollBack();
+            return error_response($e->getMessage());
+        }
+    }
 
 
   
