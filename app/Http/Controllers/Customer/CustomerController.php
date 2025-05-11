@@ -33,19 +33,18 @@ class CustomerController extends Controller
         $authUser = User::find(Auth::user()->id);
     
         $datas = User::where('user_type', "customer")
-            ->with(['contacts', 'salesPipeline']);
-    
-        // Permission wise filtering
+            ->with(['contacts', 'salesPipelines']);
+     
         if (can('all-customer')) {
             // no extra filter
         } elseif (can('own-team-customer')) {
             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            $datas = $datas->whereHas('salesPipeline', function($q) use ($juniorUserIds) {
+            $datas = $datas->whereHas('salesPipelines', function($q) use ($juniorUserIds) {
                 $q->whereIn('assigned_to', $juniorUserIds);
             });
         } elseif (can('own-customer')) {
             $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            $datas = $datas->whereHas('salesPipeline', function($q) use ($directJuniors) {
+            $datas = $datas->whereHas('salesPipelines', function($q) use ($directJuniors) {
                 $q->whereIn('assigned_to', $directJuniors);
             });
         } else {
