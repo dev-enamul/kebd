@@ -72,7 +72,7 @@ class CustomerController extends Controller
                     "id" => $user->id,
                     "project_name" => $user->project_name,
                     "client_name" => $user->client_name,
-                    "factory_name" => $contact->name ?? '',
+                    "factory_name" => $contact->factory_name ?? '',
                     "contact_person_name" => $contact->name ?? '', 
                     "contact_person_designation" => $contact->role ?? '',
                 ]);
