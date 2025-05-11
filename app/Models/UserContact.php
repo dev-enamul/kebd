@@ -22,5 +22,9 @@ class UserContact extends Model
         'linkedin',
     ];
     
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     
 }
