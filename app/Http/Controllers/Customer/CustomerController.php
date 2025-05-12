@@ -69,7 +69,7 @@ class CustomerController extends Controller
         foreach ($datas as $user) {
             foreach ($user->contacts as $contact) {
                 $contacts->push([
-                    "id" => $user->id,
+                    "id" => $contact->id,
                     "project_name" => $user->project_name,
                     "client_name" => $user->client_name,
                     "factory_name" => $contact->factory_name ?? '',
@@ -112,9 +112,8 @@ class CustomerController extends Controller
             $profilePicPath = null;
             if ($request->hasFile('profile_image')) {
                 $profilePicPath = $request->file('profile_image')->store('profile_images', 'public');
-            }
+            }    
 
-            // Create user
             $user = User::create([
                 'project_name'  => $request->project_name,
                 'client_name'   => $request->client_name,
@@ -130,8 +129,7 @@ class CustomerController extends Controller
                 'created_by'    => $authUser->id,
             ]);
 
-            
-            // Save multiple contacts
+             
             if (is_array($request->contacts)) {
                 foreach ($request->contacts as $contact) {
                     UserContact::create([
@@ -210,6 +208,24 @@ class CustomerController extends Controller
             DB::rollBack();
             return error_response($e->getMessage());
         }
+    }
+
+    public function show($id){
+        $contact = UserContact::find($id);
+        if(!$contact){
+            $data = [
+                'project_name'=> $contact->user->project_name,
+                'client_name'=> $contact->user->client_name,
+                'factory_name'=> $contact->factory_name,
+                'designation'=> $contact->role,
+                'phone'=> $contact->phone,
+                'email'=> $contact->email,
+                'whatsapp'=> $contact->whatsapp,
+            ];
+        }else{
+            $data = [];
+        }  
+        return success_response($data);
     }
 
 
