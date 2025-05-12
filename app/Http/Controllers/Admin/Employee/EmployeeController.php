@@ -161,7 +161,7 @@ class EmployeeController extends Controller
         }
 
         try {    
-            $user = User::with(['employee', 'address', 'contact', 'educations', 'document'])
+            $user = User::with(['employee'])
                         ->find($id); 
             if (!$user) {
                 return error_response('User not found', 404);

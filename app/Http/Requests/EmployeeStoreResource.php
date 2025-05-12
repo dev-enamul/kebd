@@ -39,7 +39,7 @@ class EmployeeStoreResource extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users,email',  
             'phone' => 'required|string|max:20|unique:users,phone',  
-            'designation_id' => 'required|exists:designations,id',   
+            'designation_id' => 'nullable|exists:designations,id',   
             'reporting_user_id' => 'nullable|exists:users,id',  
             'dob' => 'nullable|date', 
             'blood_group' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',  
