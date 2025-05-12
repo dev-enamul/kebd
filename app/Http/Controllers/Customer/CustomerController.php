@@ -213,6 +213,8 @@ class CustomerController extends Controller
     public function show($id){
         $contact = UserContact::find($id);
         if(!$contact){
+            return error_response(null,404,"Invalid Id");
+        }else{
             $data = [
                 'project_name'=> $contact->user->project_name,
                 'client_name'=> $contact->user->client_name,
@@ -222,8 +224,6 @@ class CustomerController extends Controller
                 'email'=> $contact->email,
                 'whatsapp'=> $contact->whatsapp,
             ];
-        }else{
-            $data = [];
         }  
         return success_response($data);
     }
