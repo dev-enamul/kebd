@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Lead;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerStoreRequest;
+use App\Http\Requests\LeadStoreRequest;
 use App\Models\Customer;
 use App\Models\FollowupCategory;
 use App\Models\FollowupLog;
@@ -155,7 +156,7 @@ class LeadController extends Controller
     
 
     
-    public function store(CustomerStoreRequest $request)
+    public function store(LeadStoreRequest $request)
     {
         if (!can("create-lead")) {
             return permission_error_response();
