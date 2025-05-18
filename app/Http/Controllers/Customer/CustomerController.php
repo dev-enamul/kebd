@@ -226,6 +226,9 @@ class CustomerController extends Controller
                 'phone'=> $contact->phone,
                 'email'=> $contact->email,
                 'whatsapp'=> $contact->whatsapp,
+                'head_office_address'=> $contact->head_office_address,
+                'factory_address'=> $contact->factory_address,
+                'remark'=> $contact->remark,
             ];
         }  
         return success_response($data);
