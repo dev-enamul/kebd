@@ -72,7 +72,7 @@ class EmployeeController extends Controller
                 'password'      => Hash::make("12345678"),
                 'user_type'     => 'employee',  
                 'profile_image' => $profilePicPath,  
-                'dob'           => $request->dob, 
+                'dob'           => $request->dob??null, 
                 'blood_group'   => $request->blood_group, 
                 'gender'        => $request->gender, 
                 'created_by'    => Auth::user()->id,
@@ -175,7 +175,7 @@ class EmployeeController extends Controller
                 'profile_image' => $user->profile_image,
                 'is_active' => $user->employee->status??0,
                 'resigned_at' => $user->employee->resigned_at??"",
-                "dob" => $user->dob, 
+                "dob" => $user->dob??"-", 
                 'blood_group' => $user->blood_group,
                 'gender' => $user->gender 
             ]);
