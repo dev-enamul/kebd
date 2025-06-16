@@ -32,5 +32,6 @@ class LeadServiceController extends Controller
         $lead->qty = $request->qty;
         $lead->service_details = $request->service_details;
         $lead->save();
+        return success_response(null,"Service details have been successfully updated.");
     }
 }
