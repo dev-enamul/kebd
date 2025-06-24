@@ -33,10 +33,9 @@ class LeadController extends Controller
             $category = $request->category_id??null;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
- 
             $query = $this->buildQuery($status, $category);
         
-            $datas = $this->filterByPermissions($query, $authUser); 
+            $datas = $this->filterByPermissions($query, $authUser);
             $pagedData = $this->processAndPaginate($datas, $request);
 
             return success_response($pagedData);
@@ -48,26 +47,43 @@ class LeadController extends Controller
     private function buildQuery($status, $category)
     {
         $query = SalesPipeline::query()
-            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id') 
+            ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
+            ->leftJoin('users as assigned_users', 'sales_pipelines.assigned_to', '=', 'assigned_users.id')
             ->leftJoin('services', 'sales_pipelines.service_id', '=', 'services.id')
             ->leftJoin('followup_categories', 'sales_pipelines.followup_categorie_id', '=', 'followup_categories.id')
-            ->select('sales_pipelines.id as lead_id', 'sales_pipelines.next_followup_date', 'sales_pipelines.last_contacted_at',
-                    'users.id as user_id', 'users.project_name as project_name', 'users.client_name as client_name','users.profile_image', 'users.email as user_email', 'users.phone as user_phone', 
-                    'services.id as service_id', 'services.title as service_name','followup_categories.title as lead_category')
+            ->select(
+                'sales_pipelines.id as lead_id',
+                'sales_pipelines.next_followup_date',
+                'sales_pipelines.last_contacted_at',
+                'sales_pipelines.assigned_to',
+                'assigned_users.name as assigned_to_name',
+
+                'users.id as user_id',
+                'users.project_name as project_name',
+                'users.client_name as client_name',
+                'users.profile_image',
+                'users.email as user_email',
+                'users.phone as user_phone',
+
+                'services.id as service_id',
+                'services.title as service_name',
+                'followup_categories.title as lead_category'
+            )
             ->where('sales_pipelines.status', $status)
             ->where('sales_pipelines.type', 'lead_data');
 
-        if (isset($category) && $category != null) {
+        if (!empty($category)) {
             $query->where('sales_pipelines.followup_categorie_id', $category);
         }
 
         return $query;
     }
 
+
     private function filterByPermissions($query, $authUser)
     {
         if (can('all-lead')) {
-            return $query->get()->toArray(); // Convert collection to array
+            return $query->get()->toArray(); 
         } elseif (can('own-team-lead')) {
             $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
             return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
@@ -98,6 +114,7 @@ class LeadController extends Controller
                 'last_contacted_at' => $salesPipeline['last_contacted_at'] ?? null,
                 'service' => $salesPipeline['service_name'] ?? null,
                 'lead_category' => $salesPipeline['lead_category'] ?? null,
+                'assigned_to' => $salesPipeline['assigned_to_name'] ?? null,
             ];
         })->values()->toArray();
 
