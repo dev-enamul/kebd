@@ -51,7 +51,7 @@ class CustomerLeadHistoryController extends Controller
                 ? Carbon::parse($request->end_date)->endOfDay() 
                 : Carbon::today()->endOfDay(); 
 
-            $employee_id = $request->user_id ?? Auth::user()->id;  
+            $employee_id = $request->employee_id ?? Auth::user()->id;  
 
             $employee = User::find($employee_id);
             $datas = FollowupLog::where('created_by', $employee_id)
