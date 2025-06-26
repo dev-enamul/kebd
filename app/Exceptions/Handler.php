@@ -31,9 +31,8 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof ValidationException) {
-            return error_response($exception->errors(),422,"Invalid credentials."); 
-        }
-
+            return error_response($exception->errors(),422,"Oops! Your email or password doesn't match our records."); 
+        } 
         return parent::render($request, $exception);
     }
 }
