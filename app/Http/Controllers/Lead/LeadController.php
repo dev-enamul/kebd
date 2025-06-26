@@ -31,9 +31,10 @@ class LeadController extends Controller
             } 
 
             $category = $request->category_id??null;
+            $employeeId = $request->employee_id ?? null;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
-            $query = $this->buildQuery($status, $category);
+            $query = $this->buildQuery($status, $category,$employeeId);
         
             $datas = $this->filterByPermissions($query, $authUser);
             $pagedData = $this->processAndPaginate($datas, $request);
@@ -44,7 +45,7 @@ class LeadController extends Controller
         }
     }
 
-    private function buildQuery($status, $category)
+    private function buildQuery($status, $category, $employeeId = null)
     {
         $query = SalesPipeline::query()
             ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
@@ -76,8 +77,13 @@ class LeadController extends Controller
             $query->where('sales_pipelines.followup_categorie_id', $category);
         }
 
+        if (!empty($employeeId)) {
+            $query->where('sales_pipelines.assigned_to', $employeeId);
+        }
+
         return $query;
     }
+
 
 
     private function filterByPermissions($query, $authUser)
