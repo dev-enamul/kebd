@@ -34,9 +34,9 @@ class LeadController extends Controller
             $employeeId = $request->employee_id ?? null;
             $status = $request->status ?? "Active";
             $authUser = User::find(Auth::user()->id);
-            $query = $this->buildQuery($status, $category,$employeeId);
+            $query = $this->buildQuery($status, $category);
         
-            $datas = $this->filterByPermissions($query, $authUser);
+            $datas = $this->filterByPermissions($query, $authUser,$employeeId);
             $pagedData = $this->processAndPaginate($datas, $request);
 
             return success_response($pagedData);
@@ -45,7 +45,7 @@ class LeadController extends Controller
         }
     }
 
-    private function buildQuery($status, $category, $employeeId = null)
+    private function buildQuery($status, $category)
     {
         $query = SalesPipeline::query()
             ->leftJoin('users', 'sales_pipelines.user_id', '=', 'users.id')
@@ -75,30 +75,31 @@ class LeadController extends Controller
 
         if (!empty($category)) {
             $query->where('sales_pipelines.followup_categorie_id', $category);
-        }
-
-        if (!empty($employeeId)) {
-            $query->where('sales_pipelines.assigned_to', $employeeId);
-        }
+        } 
 
         return $query;
     }
 
 
 
-    private function filterByPermissions($query, $authUser)
+    private function filterByPermissions($query, $authUser, $employeeId=null)
     {
-        if (can('all-lead')) {
-            return $query->get()->toArray(); 
-        } elseif (can('own-team-lead')) {
-            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
-        } elseif (can('own-lead')) {
-            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get()->toArray();
-        } else {
-            return [];  
+        if($employeeId!=null){
+            return $query->where('sales_pipelines.assigned_to', $employeeId)->get()->toArray();
+        }else{
+             if (can('all-lead')) {
+                return $query->get()->toArray(); 
+            } elseif (can('own-team-lead')) {
+                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
+            } elseif (can('own-lead')) {
+                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get()->toArray();
+            } else {
+                return [];  
+            }
         }
+       
     }
     
 

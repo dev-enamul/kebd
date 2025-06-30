@@ -109,6 +109,16 @@ class EmployeeUpdateController extends Controller
         $user->password = Hash::make($request->new_password);
         $user->save(); 
         return success_response(null,"Password updated successfully"); 
+    } 
+
+    public function resignEmployee($id){
+        $user = User::find($id);
+        if(!$user){
+            return error_response(null, 404, "Employee not found");
+        }
+        $user->status = 0;
+        $user->save();
+        return success_response(null,"Employee Resigned");
     }
     
 

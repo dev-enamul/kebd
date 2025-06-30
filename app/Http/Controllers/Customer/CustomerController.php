@@ -33,22 +33,28 @@ class CustomerController extends Controller
         }
 
         $keyword = $request->keyword;
+        $employee_id = $request->employee_id??null;
         $authUser = Auth::user();
 
         $datas = User::where('user_type', "customer")
             ->with(['contacts']);
 
-        if (can('all-customer')) {
-            // No additional filter
-        } elseif (can('own-team-customer')) {
-            $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-            $datas = $datas->whereIn('created_by', $juniorUserIds);
-        } elseif (can('own-customer')) {
-            $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-            $datas = $datas->whereIn('created_by', $directJuniors);
-        } else {
-            return success_response([]);
+        if($employee_id!=null){
+            $datas = $datas->whereIn('created_by',Auth::user()->id);
+        }else{
+            if (can('all-customer')) {
+                // No additional filter
+            } elseif (can('own-team-customer')) {
+                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
+                $datas = $datas->whereIn('created_by', $juniorUserIds);
+            } elseif (can('own-customer')) {
+                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
+                $datas = $datas->whereIn('created_by', $directJuniors);
+            } else {
+                return success_response([]);
+            }
         }
+        
 
         if ($keyword) {
             $datas = $datas->where(function ($q) use ($keyword) {
