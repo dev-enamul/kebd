@@ -32,7 +32,7 @@ class EmployeeController extends Controller
             $query = User::where('user_type', 'employee')
                 ->join('employees', 'users.id', '=', 'employees.user_id')
                 ->join('designations', 'employees.designation_id', '=', 'designations.id')
-                ->select('users.id', 'users.name', 'users.status', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation');
+                ->select('users.id', 'users.name', 'employees.status', 'users.phone', 'users.email', 'users.profile_image', 'designations.title as designation');
      
             if (can('all-employee')) {
                 $data = $query->get();
