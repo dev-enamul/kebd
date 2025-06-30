@@ -6,6 +6,7 @@ use App\Helpers\ReportingService;
 use App\Http\Controllers\Controller;
 use App\Jobs\UpdateReportingJob;
 use App\Models\DesignationLog;
+use App\Models\Employee;
 use App\Models\SalesPipeline;
 use App\Models\User;
 use App\Models\UserReporting;
@@ -112,7 +113,7 @@ class EmployeeUpdateController extends Controller
     } 
 
     public function resignEmployee($id){
-        $user = User::find($id);
+        $user = Employee::where('user_id', $id)->first();
         if(!$user){
             return error_response(null, 404, "Employee not found");
         }
