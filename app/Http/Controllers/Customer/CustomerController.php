@@ -26,35 +26,44 @@ class CustomerController extends Controller
      * Display a listing of the resource.
      */ 
 
-     public function index(Request $request)
+    public function index(Request $request)
     {
         if (!can("customer")) {
             return permission_error_response();
         }
 
         $keyword = $request->keyword;
-        $employee_id = $request->employee_id??null;
+        $employee_id = $request->employee_id ?? null;
         $authUser = Auth::user();
 
         $datas = User::where('user_type', "customer")
             ->with(['contacts']);
 
-        if($employee_id!=null){
-            $datas = $datas->whereIn('created_by',Auth::user()->id);
-        }else{
+        if ($employee_id != null) {
+            // 🔧 FIXED: Using where() instead of whereIn() since only one ID
+            $datas = $datas->where('created_by', $authUser->id);
+        } else {
             if (can('all-customer')) {
                 // No additional filter
             } elseif (can('own-team-customer')) {
-                $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
-                $datas = $datas->whereIn('created_by', $juniorUserIds);
+                $juniorUserIds = (array) json_decode($authUser->junior_user ?? "[]");
+                // 🔒 Ensure it's an array before whereIn
+                if (count($juniorUserIds)) {
+                    $datas = $datas->whereIn('created_by', $juniorUserIds);
+                } else {
+                    return success_response([]); // No juniors, return empty
+                }
             } elseif (can('own-customer')) {
                 $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-                $datas = $datas->whereIn('created_by', $directJuniors);
+                if (count($directJuniors)) {
+                    $datas = $datas->whereIn('created_by', $directJuniors);
+                } else {
+                    return success_response([]);
+                }
             } else {
                 return success_response([]);
             }
         }
-        
 
         if ($keyword) {
             $datas = $datas->where(function ($q) use ($keyword) {
@@ -79,7 +88,7 @@ class CustomerController extends Controller
                     "project_name" => $user->project_name,
                     "client_name" => $user->client_name,
                     "factory_name" => $contact->factory_name ?? '',
-                    "contact_person_name" => $contact->name ?? '', 
+                    "contact_person_name" => $contact->name ?? '',
                     "contact_person_designation" => $contact->role ?? '',
                 ]);
             }
@@ -100,6 +109,7 @@ class CustomerController extends Controller
             ],
         ]);
     }
+
  
  
  
