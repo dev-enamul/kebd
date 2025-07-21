@@ -39,9 +39,8 @@ class CustomerController extends Controller
         $datas = User::where('user_type', "customer")
             ->with(['contacts']);
 
-        if ($employee_id != null) {
-            // 🔧 FIXED: Using where() instead of whereIn() since only one ID
-            $datas = $datas->where('created_by', $authUser->id);
+        if ($employee_id != null) { 
+            $datas = $datas->where('created_by', $employee_id);
         } else {
             if (can('all-customer')) {
                 // No additional filter
