@@ -53,12 +53,7 @@ class CustomerController extends Controller
                     return success_response([]); // No juniors, return empty
                 }
             } elseif (can('own-customer')) {
-                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-                if (count($directJuniors)) {
-                    $datas = $datas->whereIn('created_by', $directJuniors);
-                } else {
-                    return success_response([]);
-                }
+                $datas = $datas->where('created_by', $authUser->id);
             } else {
                 return success_response([]);
             }
