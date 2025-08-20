@@ -92,9 +92,8 @@ class LeadController extends Controller
             } elseif (can('own-team-lead')) {
                 $juniorUserIds = json_decode($authUser->junior_user ?? "[]");
                 return $query->whereIn('sales_pipelines.assigned_to', $juniorUserIds)->get()->toArray();
-            } elseif (can('own-lead')) {
-                $directJuniors = $authUser->directJuniors->pluck('user_id')->toArray();
-                return $query->whereIn('sales_pipelines.assigned_to', $directJuniors)->get()->toArray();
+            } elseif (can('own-lead')) { 
+                return $query->where('sales_pipelines.assigned_to', $authUser->id)->get()->toArray();
             } else {
                 return [];  
             }
