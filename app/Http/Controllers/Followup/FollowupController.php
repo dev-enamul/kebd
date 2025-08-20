@@ -46,7 +46,7 @@ class FollowupController extends Controller
                             return [
                                 'id' => $followup->id,
                                 'followup_category' => $followup->followupCategory->title ?? "", 
-                                'next_followup_date' => $followup->created_at,
+                                'next_followup_date' => $followup->next_followup_date??"-",
                                 'date' => $followup->created_at,
                                 'followup_by' => $followup->followupBy->name??"-", 
                                 'notes' => $followup->notes, 
