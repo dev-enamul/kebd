@@ -32,7 +32,10 @@ class LeadController extends Controller
 
             $category = $request->category_id??null;
             $employeeId = $request->employee_id ?? null;
-            $status = $request->status ?? "Active";
+            $status = $request->status;
+            if (empty($status)) { 
+                $status = "Active";
+            }
             $authUser = User::find(Auth::user()->id);
             $query = $this->buildQuery($status, $category);
         
