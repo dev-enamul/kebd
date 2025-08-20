@@ -178,15 +178,16 @@ class CustomerController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = User::find($id);
-            if (!$user) {
-                return error_response("User not found.");
+            $contact = UserContact::find($id); 
+            if (!$contact) {
+                return error_response(null, 404, "Contact not found");
             }
+            $user_id = $contact->user_id;
 
             $authUser = Auth::user();
 
             $customer = Customer::create([
-                'user_id'        => $user->id,
+                'user_id'        => $user_id,
                 'lead_source_id' => null,
                 'referred_by'    => $authUser->id,
                 'created_by'     => $authUser->id,
@@ -195,7 +196,7 @@ class CustomerController extends Controller
             $followup_category = FollowupCategory::orderBy('serial', 'asc')->first();
 
             $pipeline = SalesPipeline::create([
-                'user_id'               => $user->id,
+                'user_id'               => $user_id,
                 'customer_id'           => $customer->id,
                 'service_id'            => null,
                 'service_details'       => null,
@@ -206,7 +207,7 @@ class CustomerController extends Controller
             ]);
 
             FollowupLog::create([
-                'user_id'               => $user->id,
+                'user_id'               => $user_id,
                 'followup_categorie_id'=> $followup_category->id,
                 'customer_id'           => $customer->id,
                 'pipeline_id'           => $pipeline->id,
