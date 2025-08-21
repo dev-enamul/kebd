@@ -15,7 +15,7 @@ class FollowupCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        try { 
+        try {
             $status = $request->status;
             if($status ==null){
                 $categories = FollowupCategory::select('id','title','slug','status','serial')->orderBy('serial','asc')->get();
@@ -29,10 +29,9 @@ class FollowupCategoryController extends Controller
                     'slug' => $query->slug,
                     'status' => $query->status,
                     'serial' => $query->serial,
-                    'value' => $query->countFolowup(), 
+                    'value' => $query->countFollowup($request->employee_id ?? null),
                 ];
             });
-            
             return success_response($datas);
         } catch (Exception $e) {
             return error_response($e->getMessage(), $e->getCode());
